@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Supplier {
+  id               String     @id @default(uuid())
+  name             String
+  country          String
+  industry         String
+  reliabilityScore Int
+  shipments        Shipment[] @relation("SupplierShipments")
+}
+
+model Customer {
+  id             String     @id @default(uuid())
+  name           String
+  country        String
+  industry       String
+  demandForecast Int
+  shipments      Shipment[] @relation("CustomerShipments")
+}
+
+model PortHub {
+  id       String   @id @default(uuid())
+  name     String
+  country  String
+  type     String   // seaport, airport, rail_hub, inland_port
+  status   String   // active, congested, closed
+  capacity Int
+}
+
+model Warehouse {
+  id       String     @id @default(uuid())
+  name     String
+  country  String
+  capacity Int
+  type     String     // regional_dc, fulfillment_center, cold_storage
+  status   String
+  inventory Inventory[]
+}
+
+model Shipment {
+  id                     String     @id @default(uuid())
+  supplierId             String
+  customerId             String
+  originLocationType     String     // supplier, port, warehouse
+  originLocationId       String
+  destinationLocationType String    // port, warehouse, customer
+  destinationLocationId   String
+  mode                   String     // sea, air, road, rail, multimodal
+  departureTime          DateTime
+  ETA                    DateTime
+  status                 String     // planned, in_transit, delayed, completed
+  riskScore              Int
+
+  supplier Supplier @relation("SupplierShipments", fields: [supplierId], references: [id])
+  customer Customer @relation("CustomerShipments", fields: [customerId], references: [id])
+
+  routes      Route[]
+  disruptions ShipmentDisruption[]
+}
+
+model Route {
+  id              String   @id @default(uuid())
+  shipmentId      String
+  fromLocationType String
+  fromLocationId   String
+  toLocationType   String
+  toLocationId     String
+  sequenceNumber   Int
+  mode             String    // sea, air, road, rail
+  carrierName      String
+  travelTimeEst    Int       // in hours
+  costEst          Float
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id])
+}
+
+model RoadFleet {
+  id         String @id @default(uuid())
+  vehicleType String // truck, van, lorry
+  capacity    Int
+  driverName  String
+  status      String // available, en_route, maintenance
+}
+
+model AirCargo {
+  id                  String @id @default(uuid())
+  airline             String
+  flightNo            String
+  capacity            Int
+  departureAirportId  String
+  arrivalAirportId    String
+  status              String
+}
+
+model RailCargo {
+  id              String @id @default(uuid())
+  trainNo         String
+  railOperator    String
+  capacity        Int
+  departureHubId  String
+  arrivalHubId    String
+  status          String
+}
+
+model Disruption {
+  id          String     @id @default(uuid())
+  type        String     // weather, strike, congestion, geopolitical, accident
+  locationType String
+  locationId   String
+  severity     String
+  description  String
+  startTime    DateTime
+  endTime      DateTime?
+  affectedShipments ShipmentDisruption[]
+}
+
+model ShipmentDisruption {
+  id              String @id @default(uuid())
+  shipmentId      String
+  disruptionId    String
+  impactDelayHours Int
+  rerouteNeeded    Boolean
+  extraCost        Float
+
+  shipment   Shipment   @relation(fields: [shipmentId], references: [id])
+  disruption Disruption @relation(fields: [disruptionId], references: [id])
+}
+
+model Inventory {
+  id           String   @id @default(uuid())
+  warehouseId  String
+  productName  String
+  sku          String
+  quantity     Int
+  reorderPoint Int
+  lastUpdated  DateTime @updatedAt
+
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id])
+}
