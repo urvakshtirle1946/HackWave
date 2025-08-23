@@ -1,5 +1,6 @@
 
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, DollarSign, Package } from 'lucide-react';
+import Chatbot from '../components/Chatbot';
 
 const kpiData = [
   { name: 'On-Time Delivery', value: '94.2%', change: '+2.1%', trend: 'up', icon: CheckCircle, color: 'text-green-500' },
@@ -25,6 +26,7 @@ const agentStatus = [
 export default function Dashboard() {
   return (
     <div className="space-y-6">
+      <Chatbot />
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpiData.map((kpi) => {

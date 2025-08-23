@@ -3,29 +3,20 @@ import { Link, useLocation, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard,
   ShieldAlert,
-  Building2,
-  TrendingUp,
-  Play,
-  Bell,
-  DollarSign,
-  Plug,
-  Users,
-  Settings,
   Menu,
-  X
+  X,
+  Truck,
+  Cpu,
+  Server,
+  Bell
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/app', icon: LayoutDashboard },
   { name: 'Risk Assessment', href: '/app/risk-assessment', icon: ShieldAlert },
-  { name: 'Suppliers', href: '/app/suppliers', icon: Building2 },
-  { name: 'Analytics', href: '/app/analytics', icon: TrendingUp },
-  { name: 'Scenarios', href: '/app/scenarios', icon: Play },
-  { name: 'Alerts', href: '/app/alerts', icon: Bell },
-  { name: 'Cost Analysis', href: '/app/cost-analysis', icon: DollarSign },
-  { name: 'Integrations', href: '/app/integrations', icon: Plug },
-  { name: 'Users', href: '/app/users', icon: Users },
-  { name: 'Settings', href: '/app/settings', icon: Settings },
+  { name: 'Transportation', href: '/app/transportation', icon: Truck },
+  { name: 'Simulation', href: '/app/simulation', icon: Cpu },
+  { name: 'Infrastructure', href: '/app/infrastructure', icon: Server },
 ];
 
 export default function Layout() {
