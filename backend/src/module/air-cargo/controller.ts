@@ -16,6 +16,9 @@ export class AirCargoController {
   static async getAirCargoById(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({ error: "Air cargo ID is required" });
+      }
       const airCargo = await prisma.airCargo.findUnique({
         where: { id },
       });
@@ -72,6 +75,10 @@ export class AirCargoController {
         status,
       } = req.body;
 
+      if (!id) {
+        return res.status(400).json({ error: "Air cargo ID is required" });
+      }
+
       const airCargo = await prisma.airCargo.update({
         where: { id },
         data: {
@@ -95,6 +102,10 @@ export class AirCargoController {
     try {
       const { id } = req.params;
 
+      if (!id) {
+        return res.status(400).json({ error: "Air cargo ID is required" });
+      }
+
       await prisma.airCargo.delete({
         where: { id },
       });
@@ -109,6 +120,10 @@ export class AirCargoController {
   static async getAirCargoByAirline(req: Request, res: Response) {
     try {
       const { airline } = req.params;
+
+      if (!airline) {
+        return res.status(400).json({ error: "Airline is required" });
+      }
       const airCargo = await prisma.airCargo.findMany({
         where: { airline },
       });
@@ -122,6 +137,10 @@ export class AirCargoController {
   static async getAirCargoByStatus(req: Request, res: Response) {
     try {
       const { status } = req.params;
+
+      if (!status) {
+        return res.status(400).json({ error: "Status is required" });
+      }
       const airCargo = await prisma.airCargo.findMany({
         where: { status },
       });
@@ -135,6 +154,11 @@ export class AirCargoController {
   static async getAirCargoByRoute(req: Request, res: Response) {
     try {
       const { departureAirportId, arrivalAirportId } = req.params;
+
+      if (!departureAirportId || !arrivalAirportId) {
+        return res.status(400).json({ error: "Both departure and arrival airport IDs are required" });
+      }
+
       const airCargo = await prisma.airCargo.findMany({
         where: {
           departureAirportId,

@@ -29,6 +29,10 @@ export class DisruptionController {
   static async getDisruptionById(req: Request, res: Response) {
     try {
       const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ error: "Disruption ID is required" });
+      }
       const disruption = await prisma.disruption.findUnique({
         where: { id },
         include: {
@@ -100,17 +104,26 @@ export class DisruptionController {
         endTime,
       } = req.body;
 
+      if (!id) {
+        return res.status(400).json({ error: "Disruption ID is required" });
+      }
+
+      // Build update data object only with defined fields
+      const updateData: any = {
+        type,
+        locationType,
+        locationId,
+        severity,
+        description,
+        endTime: endTime ? new Date(endTime) : null,
+      };
+      if (startTime) {
+        updateData.startTime = new Date(startTime);
+      }
+
       const disruption = await prisma.disruption.update({
         where: { id },
-        data: {
-          type,
-          locationType,
-          locationId,
-          severity,
-          description,
-          startTime: startTime ? new Date(startTime) : undefined,
-          endTime: endTime ? new Date(endTime) : null,
-        },
+        data: updateData,
       });
 
       res.json(disruption);
@@ -123,6 +136,10 @@ export class DisruptionController {
   static async deleteDisruption(req: Request, res: Response) {
     try {
       const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ error: "Disruption ID is required" });
+      }
 
       await prisma.disruption.delete({
         where: { id },
@@ -138,6 +155,9 @@ export class DisruptionController {
   static async getDisruptionsByType(req: Request, res: Response) {
     try {
       const { type } = req.params;
+      if (!type) {
+        return res.status(400).json({ error: "Type is required" });
+      }
       const disruptions = await prisma.disruption.findMany({
         where: { type },
         include: {
@@ -158,6 +178,9 @@ export class DisruptionController {
   static async getDisruptionsBySeverity(req: Request, res: Response) {
     try {
       const { severity } = req.params;
+      if (!severity) {
+        return res.status(400).json({ error: "Severity is required" });
+      }
       const disruptions = await prisma.disruption.findMany({
         where: { severity },
         include: {
@@ -205,6 +228,12 @@ export class DisruptionController {
   static async getDisruptionsByLocation(req: Request, res: Response) {
     try {
       const { locationType, locationId } = req.params;
+
+      if (!locationType || !locationId) {
+        return res
+          .status(400)
+          .json({ error: "Location type and ID are required" });
+      }
       const disruptions = await prisma.disruption.findMany({
         where: {
           locationType,

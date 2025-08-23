@@ -20,6 +20,9 @@ export class InventoryController {
   static async getInventoryById(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({ error: "Inventory ID is required" });
+      }
       const inventory = await prisma.inventory.findUnique({
         where: { id },
         include: {
@@ -68,6 +71,10 @@ export class InventoryController {
       const { id } = req.params;
       const { productName, sku, quantity, reorderPoint } = req.body;
 
+      if (!id) {
+        return res.status(400).json({ error: "Inventory ID is required" });
+      }
+
       const inventory = await prisma.inventory.update({
         where: { id },
         data: {
@@ -92,6 +99,10 @@ export class InventoryController {
     try {
       const { id } = req.params;
 
+      if (!id) {
+        return res.status(400).json({ error: "Inventory ID is required" });
+      }
+
       await prisma.inventory.delete({
         where: { id },
       });
@@ -106,6 +117,11 @@ export class InventoryController {
   static async getInventoryByWarehouse(req: Request, res: Response) {
     try {
       const { warehouseId } = req.params;
+
+      if (!warehouseId) {
+        return res.status(400).json({ error: "Warehouse ID is required" });
+      }
+
       const inventory = await prisma.inventory.findMany({
         where: { warehouseId },
         include: {
@@ -143,6 +159,12 @@ export class InventoryController {
   static async searchInventoryByProduct(req: Request, res: Response) {
     try {
       const { productName } = req.params;
+
+      if (!productName) {
+        return res
+          .status(400)
+          .json({ error: "Product name parameter is required" });
+      }
       const inventory = await prisma.inventory.findMany({
         where: {
           productName: {
@@ -164,6 +186,11 @@ export class InventoryController {
   static async getInventoryBySKU(req: Request, res: Response) {
     try {
       const { sku } = req.params;
+
+      if (!sku) {
+        return res.status(400).json({ error: "SKU is required" });
+      }
+
       const inventory = await prisma.inventory.findMany({
         where: { sku },
         include: {
@@ -181,6 +208,10 @@ export class InventoryController {
     try {
       const { id } = req.params;
       const { quantity } = req.body;
+
+      if (!id) {
+        return res.status(400).json({ error: "Inventory ID is required" });
+      }
 
       const inventory = await prisma.inventory.update({
         where: { id },
