@@ -30,7 +30,7 @@ export default function Dashboard() {
         {kpiData.map((kpi) => {
           const Icon = kpi.icon;
           return (
-            <div key={kpi.name} className="bg-slate-800 rounded-lg p-6 border border-slate-700">
+            <div key={kpi.name} className="bg-white/5 rounded-lg p-6 border border-white/10 backdrop-blur">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-400 mb-1">{kpi.name}</p>
@@ -46,9 +46,9 @@ export default function Dashboard() {
                     </span>
                   </div>
                 </div>
-                <div className={`p-3 rounded-full bg-slate-700 ${kpi.color}`}>
-                  <Icon size={24} />
-                </div>
+                                 <div className={`p-3 rounded-full bg-white/10 ${kpi.color}`}>
+                   <Icon size={24} />
+                 </div>
               </div>
             </div>
           );
@@ -56,52 +56,52 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Global Risk Map */}
-        <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-          <h3 className="text-lg font-semibold text-white mb-4">Global Risk Visualization</h3>
-          <div className="h-64 bg-slate-700 rounded-lg flex items-center justify-center">
+                 {/* Global Risk Map */}
+         <div className="bg-white/5 rounded-lg p-6 border border-white/10 backdrop-blur">
+           <h3 className="text-lg font-semibold text-white mb-4">Global Risk Visualization</h3>
+           <div className="h-64 bg-white/5 rounded-lg flex items-center justify-center border border-white/10">
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <AlertTriangle className="h-8 w-8 text-white" />
               </div>
-              <p className="text-gray-400">Interactive Risk Map</p>
-              <p className="text-sm text-gray-500">Real-time global supply chain visualization</p>
+                             <p className="text-white/70">Interactive Risk Map</p>
+               <p className="text-sm text-white/50">Real-time global supply chain visualization</p>
             </div>
           </div>
         </div>
 
-        {/* Recent Alerts */}
-        <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-          <h3 className="text-lg font-semibold text-white mb-4">Recent Risk Alerts</h3>
-          <div className="space-y-3">
-            {riskAlerts.map((alert) => (
-              <div key={alert.id} className="flex items-start space-x-3 p-3 bg-slate-700 rounded-lg">
+                 {/* Recent Alerts */}
+         <div className="bg-white/5 rounded-lg p-6 border border-white/10 backdrop-blur">
+           <h3 className="text-lg font-semibold text-white mb-4">Recent Risk Alerts</h3>
+           <div className="space-y-3">
+             {riskAlerts.map((alert) => (
+               <div key={alert.id} className="flex items-start space-x-3 p-3 bg-white/5 rounded-lg border border-white/10">
                 <div className={`w-3 h-3 rounded-full mt-2 ${alert.severity === 'high' ? 'bg-red-500' :
                   alert.severity === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
                   }`} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white">{alert.title}</p>
-                  <p className="text-sm text-gray-400 mt-1">{alert.description}</p>
-                  <p className="text-xs text-gray-500 mt-1">{alert.time}</p>
-                </div>
+                                 <div className="flex-1 min-w-0">
+                   <p className="text-sm font-medium text-white">{alert.title}</p>
+                   <p className="text-sm text-white/70 mt-1">{alert.description}</p>
+                   <p className="text-xs text-white/50 mt-1">{alert.time}</p>
+                 </div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Agent Status */}
-      <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
-        <h3 className="text-lg font-semibold text-white mb-4">AI Agent System Status</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {agentStatus.map((agent) => (
-            <div key={agent.name} className="bg-slate-700 rounded-lg p-4">
+             {/* Agent Status */}
+       <div className="bg-white/5 rounded-lg p-6 border border-white/10 backdrop-blur">
+         <h3 className="text-lg font-semibold text-white mb-4">AI Agent System Status</h3>
+         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+           {agentStatus.map((agent) => (
+             <div key={agent.name} className="bg-white/5 rounded-lg p-4 border border-white/10">
               <div className="flex items-center justify-between mb-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full" />
-                <span className="text-xs text-gray-400">{agent.processes}</span>
-              </div>
-              <h4 className="text-sm font-medium text-white mb-1">{agent.name}</h4>
-              <p className="text-xs text-green-400 capitalize">{agent.status}</p>
+                                 <span className="text-xs text-white/70">{agent.processes}</span>
+               </div>
+               <h4 className="text-sm font-medium text-white mb-1">{agent.name}</h4>
+               <p className="text-xs text-green-400 capitalize">{agent.status}</p>
             </div>
           ))}
         </div>
