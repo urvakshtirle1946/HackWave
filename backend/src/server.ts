@@ -53,12 +53,12 @@ app.use((err: any, req: Request, res: Response, next: any) => {
 });
 
 // 404 handler
-app.use("*", (req: Request, res: Response) => {
-  res.status(404).json({
-    error: "Route not found",
-    message: `Cannot ${req.method} ${req.originalUrl}`,
-  });
-});
+// app.use("*", (req: Request, res: Response) => {
+//   res.status(404).json({
+//     error: "Route not found",
+//     message: `Cannot ${req.method} ${req.originalUrl}`,
+//   });
+// });
 
 app.listen(config.port, () => {
   console.log(

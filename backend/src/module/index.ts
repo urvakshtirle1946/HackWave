@@ -41,7 +41,7 @@ router.get("/health", (req, res) => {
   });
 });
 
-// API Documentation endpoint
+// // API Documentation endpoint
 router.get("/endpoints", (req, res) => {
   res.json({
     message: "Supply Chain Management API Endpoints",
