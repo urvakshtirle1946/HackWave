@@ -217,7 +217,7 @@ export class MCPController {
     try {
       const agentInfo: AgentInfo = req.body;
 
-      this.agents.set(agentInfo.id, {
+      MCPController.agents.set(agentInfo.id, {
         ...agentInfo,
         lastActivity: new Date().toISOString(),
       });
@@ -240,7 +240,7 @@ export class MCPController {
 
   static async getAgents(req: Request, res: Response) {
     try {
-      const agents = Array.from(this.agents.values());
+      const agents = Array.from(MCPController.agents.values());
       res.json({
         success: true,
         agents,
@@ -268,7 +268,7 @@ export class MCPController {
 
       const mcpRequest: MCPRequest = req.body;
 
-      const agent = this.agents.get(agentId);
+      const agent = MCPController.agents.get(agentId);
       if (!agent) {
         return res.status(404).json({
           success: false,
@@ -278,7 +278,7 @@ export class MCPController {
 
       // Update agent last activity
       agent.lastActivity = new Date().toISOString();
-      this.agents.set(agentId, agent);
+      MCPController.agents.set(agentId, agent);
 
       // Add provenance for agent action
       MCPContextManager.addProvenance(mcpRequest.context.id, {
