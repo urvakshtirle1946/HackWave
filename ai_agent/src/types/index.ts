@@ -1,7 +1,7 @@
 export interface Location {
   id: string;
   name: string;
-  type: 'port' | 'supplier' | 'customer' | 'warehouse';
+  type: "port" | "supplier" | "customer" | "warehouse";
   coordinates: {
     lat: number;
     lng: number;
@@ -15,19 +15,19 @@ export interface Shipment {
   origin: string; // Location ID
   destination: string; // Location ID
   supplier: string; // Location ID
-  status: 'in_transit' | 'delayed' | 'delivered' | 'cancelled';
+  status: "in_transit" | "delayed" | "delivered" | "cancelled";
   eta: Date;
   actualArrival?: Date;
   cargo: {
     type: string;
     weight: number;
     value: number;
-    priority: 'low' | 'medium' | 'high' | 'critical';
+    priority: "low" | "medium" | "high" | "critical";
   };
   route: string[];
   vessel: {
     name: string;
-    type: 'ship' | 'plane' | 'truck';
+    type: "ship" | "plane" | "truck";
     capacity: number;
   };
   riskScore: number;
@@ -36,8 +36,8 @@ export interface Shipment {
 
 export interface Disruption {
   id: string;
-  type: 'weather' | 'geopolitical' | 'technical' | 'congestion' | 'customs';
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  type: "weather" | "geopolitical" | "technical" | "congestion" | "customs";
+  severity: "low" | "medium" | "high" | "critical";
   description: string;
   location: string; // Location ID
   startDate: Date;
@@ -73,27 +73,40 @@ export interface SimulationScenario {
   impact: {
     totalDelay: number;
     totalCostIncrease: number;
-    riskLevel: 'low' | 'medium' | 'high' | 'critical';
+    riskLevel: "low" | "medium" | "high" | "critical";
   };
   recommendations: string[];
 }
 
 export interface WeatherData {
-  location: string;
+  locationId: string;
+  location: {
+    name: string;
+    country: string;
+    type: string;
+  };
   temperature: number;
+  humidity: number;
   conditions: string;
   windSpeed: number;
   visibility: number;
-  riskLevel: 'low' | 'medium' | 'high';
+  riskLevel?: "low" | "medium" | "high";
+  timestamp: Date;
 }
 
 export interface NewsData {
+  id: string;
   title: string;
   summary: string;
-  location: string;
-  category: 'geopolitical' | 'economic' | 'environmental' | 'technical';
-  riskLevel: 'low' | 'medium' | 'high';
+  source: string;
   publishedAt: Date;
+  relevanceScore: number;
+  sentiment: "positive" | "neutral" | "negative";
+  tags: string[];
+  geopoliticalRisk: "low" | "medium" | "high";
+  location?: string;
+  category?: "geopolitical" | "economic" | "environmental" | "technical";
+  riskLevel?: "low" | "medium" | "high";
 }
 
 export interface AgentResponse {

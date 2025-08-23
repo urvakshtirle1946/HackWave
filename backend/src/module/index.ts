@@ -13,6 +13,7 @@ import railCargoRoutes from "./rail-cargo/routes";
 import disruptionRoutes from "./disruptions/routes";
 import inventoryRoutes from "./inventory/routes";
 import shipmentDisruptionRoutes from "./shipment-disruptions/routes";
+import mcpRoutes from "../routes/mcpRoutes";
 
 const router = Router();
 
@@ -29,6 +30,7 @@ router.use("/rail-cargo", railCargoRoutes);
 router.use("/disruptions", disruptionRoutes);
 router.use("/inventory", inventoryRoutes);
 router.use("/shipment-disruptions", shipmentDisruptionRoutes);
+router.use("/mcp", mcpRoutes);
 
 // Health check endpoint
 router.get("/health", (req, res) => {
