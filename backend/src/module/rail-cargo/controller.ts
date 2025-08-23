@@ -16,6 +16,9 @@ export class RailCargoController {
   static async getRailCargoById(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({ error: "Rail cargo ID is required" });
+      }
       const railCargo = await prisma.railCargo.findUnique({
         where: { id },
       });
@@ -71,6 +74,9 @@ export class RailCargoController {
         arrivalHubId,
         status,
       } = req.body;
+      if (!id) {
+        return res.status(400).json({ error: "Rail cargo ID is required" });
+      }
 
       const railCargo = await prisma.railCargo.update({
         where: { id },
@@ -95,6 +101,10 @@ export class RailCargoController {
     try {
       const { id } = req.params;
 
+      if (!id) {
+        return res.status(400).json({ error: "Rail cargo ID is required" });
+      }
+
       await prisma.railCargo.delete({
         where: { id },
       });
@@ -109,6 +119,11 @@ export class RailCargoController {
   static async getRailCargoByOperator(req: Request, res: Response) {
     try {
       const { railOperator } = req.params;
+
+      if (!railOperator) {
+        return res.status(400).json({ error: "Rail operator is required" });
+      }
+
       const railCargo = await prisma.railCargo.findMany({
         where: { railOperator },
       });
@@ -122,6 +137,11 @@ export class RailCargoController {
   static async getRailCargoByStatus(req: Request, res: Response) {
     try {
       const { status } = req.params;
+
+      if (!status) {
+        return res.status(400).json({ error: "Status is required" });
+      }
+
       const railCargo = await prisma.railCargo.findMany({
         where: { status },
       });
@@ -135,6 +155,11 @@ export class RailCargoController {
   static async getRailCargoByRoute(req: Request, res: Response) {
     try {
       const { departureHubId, arrivalHubId } = req.params;
+
+      if (!departureHubId || !arrivalHubId) {
+        return res.status(400).json({ error: "Both departure and arrival hub IDs are required" });
+      }
+
       const railCargo = await prisma.railCargo.findMany({
         where: {
           departureHubId,

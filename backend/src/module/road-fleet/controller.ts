@@ -16,6 +16,9 @@ export class RoadFleetController {
   static async getRoadFleetById(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({ error: "Vehicle ID is required" });
+      }
       const vehicle = await prisma.roadFleet.findUnique({
         where: { id },
       });
@@ -55,6 +58,10 @@ export class RoadFleetController {
     try {
       const { id } = req.params;
       const { vehicleType, capacity, driverName, status } = req.body;
+      if (!id) {
+        return res.status(400).json({ error: "Vehicle ID is required" });
+      }
+
 
       const vehicle = await prisma.roadFleet.update({
         where: { id },
@@ -76,6 +83,9 @@ export class RoadFleetController {
   static async deleteRoadFleet(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({ error: "Vehicle ID is required" });
+      }
 
       await prisma.roadFleet.delete({
         where: { id },
@@ -91,6 +101,11 @@ export class RoadFleetController {
   static async getRoadFleetByStatus(req: Request, res: Response) {
     try {
       const { status } = req.params;
+
+      if (!status) {
+        return res.status(400).json({ error: "Vehicle ID is required" });
+      }
+
       const vehicles = await prisma.roadFleet.findMany({
         where: { status },
       });
@@ -104,6 +119,10 @@ export class RoadFleetController {
   static async getRoadFleetByType(req: Request, res: Response) {
     try {
       const { vehicleType } = req.params;
+      if (!vehicleType) {
+        return res.status(400).json({ error: "Vehicle ID is required" });
+      }
+
       const vehicles = await prisma.roadFleet.findMany({
         where: { vehicleType },
       });

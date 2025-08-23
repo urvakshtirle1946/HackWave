@@ -26,6 +26,11 @@ export class ShipmentDisruptionController {
   static async getShipmentDisruptionById(req: Request, res: Response) {
     try {
       const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ error: "Shipment disruption ID is required" });
+      }
+
       const shipmentDisruption = await prisma.shipmentDisruption.findUnique({
         where: { id },
         include: {
@@ -86,6 +91,10 @@ export class ShipmentDisruptionController {
       const { id } = req.params;
       const { impactDelayHours, rerouteNeeded, extraCost } = req.body;
 
+      if (!id) {
+        return res.status(400).json({ error: "Shipment disruption ID is required" });
+      }
+
       const shipmentDisruption = await prisma.shipmentDisruption.update({
         where: { id },
         data: {
@@ -110,6 +119,10 @@ export class ShipmentDisruptionController {
     try {
       const { id } = req.params;
 
+      if (!id) {
+        return res.status(400).json({ error: "Shipment disruption ID is required" });
+      }
+
       await prisma.shipmentDisruption.delete({
         where: { id },
       });
@@ -124,6 +137,11 @@ export class ShipmentDisruptionController {
   static async getShipmentDisruptionsByShipment(req: Request, res: Response) {
     try {
       const { shipmentId } = req.params;
+
+      if (!shipmentId) {
+        return res.status(400).json({ error: "Shipment ID is required" });
+      }
+
       const shipmentDisruptions = await prisma.shipmentDisruption.findMany({
         where: { shipmentId },
         include: {
@@ -143,6 +161,11 @@ export class ShipmentDisruptionController {
   static async getShipmentDisruptionsByDisruption(req: Request, res: Response) {
     try {
       const { disruptionId } = req.params;
+
+      if (!disruptionId) {
+        return res.status(400).json({ error: "Disruption ID is required" });
+      }
+
       const shipmentDisruptions = await prisma.shipmentDisruption.findMany({
         where: { disruptionId },
         include: {

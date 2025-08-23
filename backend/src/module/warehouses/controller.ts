@@ -20,6 +20,10 @@ export class WarehouseController {
   static async getWarehouseById(req: Request, res: Response) {
     try {
       const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ error: "Warehouse id is required" });
+      }
       const warehouse = await prisma.warehouse.findUnique({
         where: { id },
         include: {
@@ -64,6 +68,10 @@ export class WarehouseController {
       const { id } = req.params;
       const { name, country, capacity, type, status } = req.body;
 
+      if (!id) {
+        return res.status(400).json({ error: "Warehouse id is required" });
+      }
+
       const warehouse = await prisma.warehouse.update({
         where: { id },
         data: {
@@ -85,6 +93,9 @@ export class WarehouseController {
   static async deleteWarehouse(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({ error: "Warehouse id is required" });
+      }
 
       await prisma.warehouse.delete({
         where: { id },
@@ -100,6 +111,9 @@ export class WarehouseController {
   static async getWarehousesByType(req: Request, res: Response) {
     try {
       const { type } = req.params;
+      if (!type) {
+        return res.status(400).json({ error: "Warehouse type is required" });
+      }
       const warehouses = await prisma.warehouse.findMany({
         where: { type },
         include: {
@@ -116,6 +130,9 @@ export class WarehouseController {
   static async getWarehouseInventory(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({ error: "Warehouse id is required" });
+      }
       const inventory = await prisma.inventory.findMany({
         where: { warehouseId: id },
         include: {

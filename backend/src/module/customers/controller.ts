@@ -20,6 +20,12 @@ export class CustomerController {
   static async getCustomerById(req: Request, res: Response) {
     try {
       const { id } = req.params;
+
+      if (!id) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Customer id is required');
+      }
+
       const customer = await prisma.customer.findUnique({
         where: { id },
         include: {
@@ -63,6 +69,11 @@ export class CustomerController {
       const { id } = req.params;
       const { name, country, industry, demandForecast } = req.body;
 
+      if (!id) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Customer id is required');
+      }
+
       const customer = await prisma.customer.update({
         where: { id },
         data: {
@@ -83,6 +94,11 @@ export class CustomerController {
   static async deleteCustomer(req: Request, res: Response) {
     try {
       const { id } = req.params;
+
+      if (!id) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Customer id is required');
+      }
 
       await prisma.customer.delete({
         where: { id },

@@ -16,6 +16,10 @@ export class PortHubController {
   static async getPortHubById(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      if (!id) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Customer id is required');
+      }
       const portHub = await prisma.portHub.findUnique({
         where: { id },
       });
@@ -57,6 +61,11 @@ export class PortHubController {
       const { id } = req.params;
       const { name, country, type, status, capacity } = req.body;
 
+      if (!id) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Customer id is required');
+      }
+
       const portHub = await prisma.portHub.update({
         where: { id },
         data: {
@@ -79,6 +88,11 @@ export class PortHubController {
     try {
       const { id } = req.params;
 
+      if (!id) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Customer id is required');
+      }
+
       await prisma.portHub.delete({
         where: { id },
       });
@@ -93,6 +107,11 @@ export class PortHubController {
   static async getPortHubsByType(req: Request, res: Response) {
     try {
       const { type } = req.params;
+
+      if (!type) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Port hub type is required');
+      }
       const portHubs = await prisma.portHub.findMany({
         where: { type },
       });
@@ -106,6 +125,12 @@ export class PortHubController {
   static async getPortHubsByStatus(req: Request, res: Response) {
     try {
       const { status } = req.params;
+
+      if (!status) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Port hub status is required');
+      }
+
       const portHubs = await prisma.portHub.findMany({
         where: { status },
       });

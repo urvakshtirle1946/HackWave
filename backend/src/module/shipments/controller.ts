@@ -27,6 +27,10 @@ export class ShipmentController {
   static async getShipmentById(req: Request, res: Response) {
     try {
       const { id } = req.params;
+      if (!id) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Customer id is required');
+      }
       const shipment = await prisma.shipment.findUnique({
         where: { id },
         include: {
@@ -110,6 +114,11 @@ export class ShipmentController {
         riskScore,
       } = req.body;
 
+      if (!id) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Shipment id is required');
+      }
+
       const shipment = await prisma.shipment.update({
         where: { id },
         data: {
@@ -118,8 +127,8 @@ export class ShipmentController {
           destinationLocationType,
           destinationLocationId,
           mode,
-          departureTime: departureTime ? new Date(departureTime) : undefined,
-          ETA: ETA ? new Date(ETA) : undefined,
+          ...(departureTime !== undefined ? { departureTime: new Date(departureTime) } : {}),
+          ...(ETA !== undefined ? { ETA: new Date(ETA) } : {}),
           status,
           riskScore,
         },
@@ -140,6 +149,11 @@ export class ShipmentController {
     try {
       const { id } = req.params;
 
+      if (!id) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Shipment id is required');
+      }
+
       await prisma.shipment.delete({
         where: { id },
       });
@@ -154,6 +168,11 @@ export class ShipmentController {
   static async getShipmentsByStatus(req: Request, res: Response) {
     try {
       const { status } = req.params;
+
+      if (!status) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Shipment status is required');
+      }
       const shipments = await prisma.shipment.findMany({
         where: { status },
         include: {
@@ -171,6 +190,12 @@ export class ShipmentController {
   static async getShipmentsBySupplier(req: Request, res: Response) {
     try {
       const { supplierId } = req.params;
+
+      if (!supplierId) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Supplier id is required');
+      }
+
       const shipments = await prisma.shipment.findMany({
         where: { supplierId },
         include: {
@@ -189,6 +214,11 @@ export class ShipmentController {
   static async getShipmentsByCustomer(req: Request, res: Response) {
     try {
       const { customerId } = req.params;
+
+      if (!customerId) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Customer id is required');
+      }
       const shipments = await prisma.shipment.findMany({
         where: { customerId },
         include: {
@@ -207,6 +237,12 @@ export class ShipmentController {
   static async getShipmentRoutes(req: Request, res: Response) {
     try {
       const { id } = req.params;
+
+      if (!id) {
+        // handle error, e.g. throw or return a response
+        throw new Error('Shipment id is required');
+      }
+
       const routes = await prisma.route.findMany({
         where: { shipmentId: id },
         orderBy: { sequenceNumber: "asc" },

@@ -25,6 +25,10 @@ export class RouteController {
   static async getRouteById(req: Request, res: Response) {
     try {
       const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({ error: "Route ID is required" });
+      }
       const route = await prisma.route.findUnique({
         where: { id },
         include: {
@@ -103,6 +107,10 @@ export class RouteController {
         costEst,
       } = req.body;
 
+      if (!id) {
+        return res.status(400).json({ error: "Route ID is required" });
+      }
+
       const route = await prisma.route.update({
         where: { id },
         data: {
@@ -132,6 +140,10 @@ export class RouteController {
     try {
       const { id } = req.params;
 
+      if (!id) {
+        return res.status(400).json({ error: "Route ID is required" });
+      }
+
       await prisma.route.delete({
         where: { id },
       });
@@ -146,6 +158,10 @@ export class RouteController {
   static async getRoutesByMode(req: Request, res: Response) {
     try {
       const { mode } = req.params;
+
+      if (!mode) {
+        return res.status(400).json({ error: "Route mode is required" });
+      }
       const routes = await prisma.route.findMany({
         where: { mode },
         include: {
@@ -162,6 +178,10 @@ export class RouteController {
   static async getRoutesByCarrier(req: Request, res: Response) {
     try {
       const { carrierName } = req.params;
+
+      if (!carrierName) {
+        return res.status(400).json({ error: "Carrier name is required" });
+      }
       const routes = await prisma.route.findMany({
         where: { carrierName },
         include: {
