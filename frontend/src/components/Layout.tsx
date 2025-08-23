@@ -8,15 +8,37 @@ import {
   Truck,
   Cpu,
   Server,
-  Bell
+  Bell,
+  Users,
+  Building2,
+  Ship,
+  Warehouse,
+  Package,
+  Route,
+  Plane,
+  Train,
+  AlertTriangle,
+  BarChart3,
+  Settings,
+  UserPlus
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/app', icon: LayoutDashboard },
-  { name: 'Risk Assessment', href: '/app/risk-assessment', icon: ShieldAlert },
-  { name: 'Transportation', href: '/app/transportation', icon: Truck },
-  { name: 'Simulation', href: '/app/simulation', icon: Cpu },
-  { name: 'Infrastructure', href: '/app/infrastructure', icon: Server },
+  { name: 'Suppliers', href: '/app/suppliers', icon: Building2 },
+  { name: 'Customers', href: '/app/customers', icon: Users },
+  { name: 'Port Hubs', href: '/app/port-hubs', icon: Ship },
+  { name: 'Warehouses', href: '/app/warehouses', icon: Warehouse },
+  { name: 'Shipments', href: '/app/shipments', icon: Package },
+  { name: 'Routes', href: '/app/routes', icon: Route },
+  { name: 'Road Fleet', href: '/app/road-fleet', icon: Truck },
+  { name: 'Air Cargo', href: '/app/air-cargo', icon: Plane },
+  { name: 'Rail Cargo', href: '/app/rail-cargo', icon: Train },
+  { name: 'Disruptions', href: '/app/disruptions', icon: AlertTriangle },
+  { name: 'Inventory', href: '/app/inventory', icon: BarChart3 },
+  { name: 'Analytics', href: '/app/analytics', icon: Cpu },
+  { name: 'User Management', href: '/app/user-management', icon: UserPlus },
+  { name: 'Settings', href: '/app/settings', icon: Settings },
 ];
 
 export default function Layout() {

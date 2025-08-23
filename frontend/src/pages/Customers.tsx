@@ -1,26 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { suppliersAPI } from '../services/api';
+import { customersAPI } from '../services/api';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
 
-interface Supplier {
+interface Customer {
   id: string;
   name: string;
   country: string;
   industry: string;
-  reliabilityScore: number;
+  demandForecast: number;
 }
 
-export default function Suppliers() {
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+export default function Customers() {
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     country: '',
     industry: '',
-    reliabilityScore: 0,
+    demandForecast: 0,
   });
 
   const columns = [
@@ -28,66 +28,62 @@ export default function Suppliers() {
     { key: 'country', label: 'Country', sortable: true },
     { key: 'industry', label: 'Industry', sortable: true },
     { 
-      key: 'reliabilityScore', 
-      label: 'Reliability Score', 
+      key: 'demandForecast', 
+      label: 'Demand Forecast', 
       sortable: true,
       render: (value: number) => (
-        <span className={`px-2 py-1 rounded text-xs ${
-          value >= 80 ? 'bg-green-500/20 text-green-400' :
-          value >= 60 ? 'bg-yellow-500/20 text-yellow-400' :
-          'bg-red-500/20 text-red-400'
-        }`}>
-          {value}/100
+        <span className="text-white font-medium">
+          {value.toLocaleString()} units
         </span>
       )
     },
   ];
 
   useEffect(() => {
-    fetchSuppliers();
+    fetchCustomers();
   }, []);
 
-  const fetchSuppliers = async () => {
+  const fetchCustomers = async () => {
     try {
       setLoading(true);
-      const data = await suppliersAPI.getAll();
-      setSuppliers(data);
+      const data = await customersAPI.getAll();
+      setCustomers(data);
     } catch (error) {
-      console.error('Error fetching suppliers:', error);
+      console.error('Error fetching customers:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleAdd = () => {
-    setEditingSupplier(null);
+    setEditingCustomer(null);
     setFormData({
       name: '',
       country: '',
       industry: '',
-      reliabilityScore: 0,
+      demandForecast: 0,
     });
     setIsModalOpen(true);
   };
 
-  const handleEdit = (supplier: Supplier) => {
-    setEditingSupplier(supplier);
+  const handleEdit = (customer: Customer) => {
+    setEditingCustomer(customer);
     setFormData({
-      name: supplier.name,
-      country: supplier.country,
-      industry: supplier.industry,
-      reliabilityScore: supplier.reliabilityScore,
+      name: customer.name,
+      country: customer.country,
+      industry: customer.industry,
+      demandForecast: customer.demandForecast,
     });
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (supplier: Supplier) => {
-    if (window.confirm(`Are you sure you want to delete ${supplier.name}?`)) {
+  const handleDelete = async (customer: Customer) => {
+    if (window.confirm(`Are you sure you want to delete ${customer.name}?`)) {
       try {
-        await suppliersAPI.delete(supplier.id);
-        await fetchSuppliers();
+        await customersAPI.delete(customer.id);
+        await fetchCustomers();
       } catch (error) {
-        console.error('Error deleting supplier:', error);
+        console.error('Error deleting customer:', error);
       }
     }
   };
@@ -95,15 +91,15 @@ export default function Suppliers() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (editingSupplier) {
-        await suppliersAPI.update(editingSupplier.id, formData);
+      if (editingCustomer) {
+        await customersAPI.update(editingCustomer.id, formData);
       } else {
-        await suppliersAPI.create(formData);
+        await customersAPI.create(formData);
       }
       setIsModalOpen(false);
-      await fetchSuppliers();
+      await fetchCustomers();
     } catch (error) {
-      console.error('Error saving supplier:', error);
+      console.error('Error saving customer:', error);
     }
   };
 
@@ -111,20 +107,20 @@ export default function Suppliers() {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'reliabilityScore' ? parseInt(value) || 0 : value,
+      [name]: name === 'demandForecast' ? parseInt(value) || 0 : value,
     }));
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Suppliers Management</h1>
+        <h1 className="text-2xl font-bold text-white">Customers Management</h1>
       </div>
 
       <DataTable
-        data={suppliers}
+        data={customers}
         columns={columns}
-        title="Suppliers"
+        title="Customers"
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -134,7 +130,7 @@ export default function Suppliers() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingSupplier ? 'Edit Supplier' : 'Add New Supplier'}
+        title={editingCustomer ? 'Edit Customer' : 'Add New Customer'}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -148,7 +144,7 @@ export default function Suppliers() {
               onChange={handleInputChange}
               required
               className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Supplier name"
+              placeholder="Customer name"
             />
           </div>
 
@@ -184,18 +180,17 @@ export default function Suppliers() {
 
           <div>
             <label className="block text-sm font-medium text-white mb-2">
-              Reliability Score (0-100)
+              Demand Forecast (units)
             </label>
             <input
               type="number"
-              name="reliabilityScore"
-              value={formData.reliabilityScore}
+              name="demandForecast"
+              value={formData.demandForecast}
               onChange={handleInputChange}
               min="0"
-              max="100"
               required
               className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="0-100"
+              placeholder="Expected demand"
             />
           </div>
 
@@ -211,7 +206,7 @@ export default function Suppliers() {
               type="submit"
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
-              {editingSupplier ? 'Update' : 'Create'}
+              {editingCustomer ? 'Update' : 'Create'}
             </button>
           </div>
         </form>

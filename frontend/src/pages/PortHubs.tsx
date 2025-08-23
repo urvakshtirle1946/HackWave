@@ -1,93 +1,107 @@
 import React, { useState, useEffect } from 'react';
-import { suppliersAPI } from '../services/api';
+import { portHubsAPI } from '../services/api';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
 
-interface Supplier {
+interface PortHub {
   id: string;
   name: string;
   country: string;
-  industry: string;
-  reliabilityScore: number;
+  type: string;
+  status: string;
+  capacity: number;
 }
 
-export default function Suppliers() {
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+export default function PortHubs() {
+  const [portHubs, setPortHubs] = useState<PortHub[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
+  const [editingPortHub, setEditingPortHub] = useState<PortHub | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     country: '',
-    industry: '',
-    reliabilityScore: 0,
+    type: '',
+    status: '',
+    capacity: 0,
   });
 
   const columns = [
     { key: 'name', label: 'Name', sortable: true },
     { key: 'country', label: 'Country', sortable: true },
-    { key: 'industry', label: 'Industry', sortable: true },
+    { key: 'type', label: 'Type', sortable: true, render: (value: string) => value.replace('_', ' ').toUpperCase() },
     { 
-      key: 'reliabilityScore', 
-      label: 'Reliability Score', 
+      key: 'status', 
+      label: 'Status', 
       sortable: true,
-      render: (value: number) => (
+      render: (value: string) => (
         <span className={`px-2 py-1 rounded text-xs ${
-          value >= 80 ? 'bg-green-500/20 text-green-400' :
-          value >= 60 ? 'bg-yellow-500/20 text-yellow-400' :
+          value === 'active' ? 'bg-green-500/20 text-green-400' :
+          value === 'congested' ? 'bg-yellow-500/20 text-yellow-400' :
           'bg-red-500/20 text-red-400'
         }`}>
-          {value}/100
+          {value.toUpperCase()}
+        </span>
+      )
+    },
+    { 
+      key: 'capacity', 
+      label: 'Capacity', 
+      sortable: true,
+      render: (value: number) => (
+        <span className="text-white font-medium">
+          {value.toLocaleString()} units
         </span>
       )
     },
   ];
 
   useEffect(() => {
-    fetchSuppliers();
+    fetchPortHubs();
   }, []);
 
-  const fetchSuppliers = async () => {
+  const fetchPortHubs = async () => {
     try {
       setLoading(true);
-      const data = await suppliersAPI.getAll();
-      setSuppliers(data);
+      const data = await portHubsAPI.getAll();
+      setPortHubs(data);
     } catch (error) {
-      console.error('Error fetching suppliers:', error);
+      console.error('Error fetching port hubs:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleAdd = () => {
-    setEditingSupplier(null);
+    setEditingPortHub(null);
     setFormData({
       name: '',
       country: '',
-      industry: '',
-      reliabilityScore: 0,
+      type: '',
+      status: '',
+      capacity: 0,
     });
     setIsModalOpen(true);
   };
 
-  const handleEdit = (supplier: Supplier) => {
-    setEditingSupplier(supplier);
+  const handleEdit = (portHub: PortHub) => {
+    setEditingPortHub(portHub);
     setFormData({
-      name: supplier.name,
-      country: supplier.country,
-      industry: supplier.industry,
-      reliabilityScore: supplier.reliabilityScore,
+      name: portHub.name,
+      country: portHub.country,
+      type: portHub.type,
+      status: portHub.status,
+      capacity: portHub.capacity,
     });
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (supplier: Supplier) => {
-    if (window.confirm(`Are you sure you want to delete ${supplier.name}?`)) {
+  const handleDelete = async (portHub: PortHub) => {
+    if (window.confirm(`Are you sure you want to delete ${portHub.name}?`)) {
       try {
-        await suppliersAPI.delete(supplier.id);
-        await fetchSuppliers();
+        await portHubsAPI.delete(portHub.id);
+        await fetchPortHubs();
       } catch (error) {
-        console.error('Error deleting supplier:', error);
+        console.error('Error deleting port hub:', error);
       }
     }
   };
@@ -95,15 +109,15 @@ export default function Suppliers() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (editingSupplier) {
-        await suppliersAPI.update(editingSupplier.id, formData);
+      if (editingPortHub) {
+        await portHubsAPI.update(editingPortHub.id, formData);
       } else {
-        await suppliersAPI.create(formData);
+        await portHubsAPI.create(formData);
       }
       setIsModalOpen(false);
-      await fetchSuppliers();
+      await fetchPortHubs();
     } catch (error) {
-      console.error('Error saving supplier:', error);
+      console.error('Error saving port hub:', error);
     }
   };
 
@@ -111,20 +125,20 @@ export default function Suppliers() {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'reliabilityScore' ? parseInt(value) || 0 : value,
+      [name]: name === 'capacity' ? parseInt(value) || 0 : value,
     }));
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Suppliers Management</h1>
+        <h1 className="text-2xl font-bold text-white">Port Hubs Management</h1>
       </div>
 
       <DataTable
-        data={suppliers}
+        data={portHubs}
         columns={columns}
-        title="Suppliers"
+        title="Port Hubs"
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -134,7 +148,7 @@ export default function Suppliers() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingSupplier ? 'Edit Supplier' : 'Add New Supplier'}
+        title={editingPortHub ? 'Edit Port Hub' : 'Add New Port Hub'}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -148,7 +162,7 @@ export default function Suppliers() {
               onChange={handleInputChange}
               required
               className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Supplier name"
+              placeholder="Port hub name"
             />
           </div>
 
@@ -169,33 +183,54 @@ export default function Suppliers() {
 
           <div>
             <label className="block text-sm font-medium text-white mb-2">
-              Industry
+              Type
             </label>
-            <input
-              type="text"
-              name="industry"
-              value={formData.industry}
+            <select
+              name="type"
+              value={formData.type}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Industry"
-            />
+              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Type</option>
+              <option value="seaport">Seaport</option>
+              <option value="airport">Airport</option>
+              <option value="rail_hub">Rail Hub</option>
+              <option value="inland_port">Inland Port</option>
+            </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-white mb-2">
-              Reliability Score (0-100)
+              Status
+            </label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleInputChange}
+              required
+              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Status</option>
+              <option value="active">Active</option>
+              <option value="congested">Congested</option>
+              <option value="closed">Closed</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              Capacity (units)
             </label>
             <input
               type="number"
-              name="reliabilityScore"
-              value={formData.reliabilityScore}
+              name="capacity"
+              value={formData.capacity}
               onChange={handleInputChange}
               min="0"
-              max="100"
               required
               className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="0-100"
+              placeholder="Capacity"
             />
           </div>
 
@@ -211,7 +246,7 @@ export default function Suppliers() {
               type="submit"
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
-              {editingSupplier ? 'Update' : 'Create'}
+              {editingPortHub ? 'Update' : 'Create'}
             </button>
           </div>
         </form>

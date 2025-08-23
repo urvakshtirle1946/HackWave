@@ -1,93 +1,107 @@
 import React, { useState, useEffect } from 'react';
-import { suppliersAPI } from '../services/api';
+import { warehousesAPI } from '../services/api';
 import DataTable from '../components/DataTable';
 import Modal from '../components/Modal';
 
-interface Supplier {
+interface Warehouse {
   id: string;
   name: string;
   country: string;
-  industry: string;
-  reliabilityScore: number;
+  capacity: number;
+  type: string;
+  status: string;
 }
 
-export default function Suppliers() {
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+export default function Warehouses() {
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
+  const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     country: '',
-    industry: '',
-    reliabilityScore: 0,
+    capacity: 0,
+    type: '',
+    status: '',
   });
 
   const columns = [
     { key: 'name', label: 'Name', sortable: true },
     { key: 'country', label: 'Country', sortable: true },
-    { key: 'industry', label: 'Industry', sortable: true },
+    { key: 'type', label: 'Type', sortable: true, render: (value: string) => value.replace('_', ' ').toUpperCase() },
     { 
-      key: 'reliabilityScore', 
-      label: 'Reliability Score', 
+      key: 'status', 
+      label: 'Status', 
       sortable: true,
-      render: (value: number) => (
+      render: (value: string) => (
         <span className={`px-2 py-1 rounded text-xs ${
-          value >= 80 ? 'bg-green-500/20 text-green-400' :
-          value >= 60 ? 'bg-yellow-500/20 text-yellow-400' :
+          value === 'active' ? 'bg-green-500/20 text-green-400' :
+          value === 'maintenance' ? 'bg-yellow-500/20 text-yellow-400' :
           'bg-red-500/20 text-red-400'
         }`}>
-          {value}/100
+          {value.toUpperCase()}
+        </span>
+      )
+    },
+    { 
+      key: 'capacity', 
+      label: 'Capacity', 
+      sortable: true,
+      render: (value: number) => (
+        <span className="text-white font-medium">
+          {value.toLocaleString()} units
         </span>
       )
     },
   ];
 
   useEffect(() => {
-    fetchSuppliers();
+    fetchWarehouses();
   }, []);
 
-  const fetchSuppliers = async () => {
+  const fetchWarehouses = async () => {
     try {
       setLoading(true);
-      const data = await suppliersAPI.getAll();
-      setSuppliers(data);
+      const data = await warehousesAPI.getAll();
+      setWarehouses(data);
     } catch (error) {
-      console.error('Error fetching suppliers:', error);
+      console.error('Error fetching warehouses:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleAdd = () => {
-    setEditingSupplier(null);
+    setEditingWarehouse(null);
     setFormData({
       name: '',
       country: '',
-      industry: '',
-      reliabilityScore: 0,
+      capacity: 0,
+      type: '',
+      status: '',
     });
     setIsModalOpen(true);
   };
 
-  const handleEdit = (supplier: Supplier) => {
-    setEditingSupplier(supplier);
+  const handleEdit = (warehouse: Warehouse) => {
+    setEditingWarehouse(warehouse);
     setFormData({
-      name: supplier.name,
-      country: supplier.country,
-      industry: supplier.industry,
-      reliabilityScore: supplier.reliabilityScore,
+      name: warehouse.name,
+      country: warehouse.country,
+      capacity: warehouse.capacity,
+      type: warehouse.type,
+      status: warehouse.status,
     });
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (supplier: Supplier) => {
-    if (window.confirm(`Are you sure you want to delete ${supplier.name}?`)) {
+  const handleDelete = async (warehouse: Warehouse) => {
+    if (window.confirm(`Are you sure you want to delete ${warehouse.name}?`)) {
       try {
-        await suppliersAPI.delete(supplier.id);
-        await fetchSuppliers();
+        await warehousesAPI.delete(warehouse.id);
+        await fetchWarehouses();
       } catch (error) {
-        console.error('Error deleting supplier:', error);
+        console.error('Error deleting warehouse:', error);
       }
     }
   };
@@ -95,15 +109,15 @@ export default function Suppliers() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (editingSupplier) {
-        await suppliersAPI.update(editingSupplier.id, formData);
+      if (editingWarehouse) {
+        await warehousesAPI.update(editingWarehouse.id, formData);
       } else {
-        await suppliersAPI.create(formData);
+        await warehousesAPI.create(formData);
       }
       setIsModalOpen(false);
-      await fetchSuppliers();
+      await fetchWarehouses();
     } catch (error) {
-      console.error('Error saving supplier:', error);
+      console.error('Error saving warehouse:', error);
     }
   };
 
@@ -111,20 +125,20 @@ export default function Suppliers() {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'reliabilityScore' ? parseInt(value) || 0 : value,
+      [name]: name === 'capacity' ? parseInt(value) || 0 : value,
     }));
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Suppliers Management</h1>
+        <h1 className="text-2xl font-bold text-white">Warehouses Management</h1>
       </div>
 
       <DataTable
-        data={suppliers}
+        data={warehouses}
         columns={columns}
-        title="Suppliers"
+        title="Warehouses"
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -134,7 +148,7 @@ export default function Suppliers() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingSupplier ? 'Edit Supplier' : 'Add New Supplier'}
+        title={editingWarehouse ? 'Edit Warehouse' : 'Add New Warehouse'}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -148,7 +162,7 @@ export default function Suppliers() {
               onChange={handleInputChange}
               required
               className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Supplier name"
+              placeholder="Warehouse name"
             />
           </div>
 
@@ -169,33 +183,53 @@ export default function Suppliers() {
 
           <div>
             <label className="block text-sm font-medium text-white mb-2">
-              Industry
+              Type
             </label>
-            <input
-              type="text"
-              name="industry"
-              value={formData.industry}
+            <select
+              name="type"
+              value={formData.type}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Industry"
-            />
+              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Type</option>
+              <option value="regional_dc">Regional DC</option>
+              <option value="fulfillment_center">Fulfillment Center</option>
+              <option value="cold_storage">Cold Storage</option>
+            </select>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-white mb-2">
-              Reliability Score (0-100)
+              Status
+            </label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleInputChange}
+              required
+              className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Status</option>
+              <option value="active">Active</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">
+              Capacity (units)
             </label>
             <input
               type="number"
-              name="reliabilityScore"
-              value={formData.reliabilityScore}
+              name="capacity"
+              value={formData.capacity}
               onChange={handleInputChange}
               min="0"
-              max="100"
               required
               className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="0-100"
+              placeholder="Capacity"
             />
           </div>
 
@@ -211,7 +245,7 @@ export default function Suppliers() {
               type="submit"
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
-              {editingSupplier ? 'Update' : 'Create'}
+              {editingWarehouse ? 'Update' : 'Create'}
             </button>
           </div>
         </form>
