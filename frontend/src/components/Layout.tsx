@@ -20,12 +20,14 @@ import {
   AlertTriangle,
   BarChart3,
   Settings,
-  UserPlus
+  UserPlus,
+  Navigation
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/app', icon: LayoutDashboard },
   { name: 'Shipments', href: '/app/shipments', icon: Package },
+  { name: 'Shipment Tracking', href: '/app/shipment-tracking', icon: Navigation },
   { name: 'Routes', href: '/app/routes', icon: Route },
   { name: 'Analytics', href: '/app/analytics', icon: Cpu },
   { name: 'Vulnerability Assessment', href: '/app/vulnerability-assessment', icon: ShieldAlert },

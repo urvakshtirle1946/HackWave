@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, X, Minimize2, Maximize2, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import aiAgentAPI from '../services/aiAgentApi';
 
 interface Message {
@@ -14,7 +16,31 @@ interface Message {
 const initialMessages: Message[] = [
   {
     id: '1',
-    text: 'Hello! I\'m your intelligent Supply Chain AI Assistant. I have access to your real-time data and can help you with:\n\n• Shipment status and tracking\n• Risk assessment and disruptions\n• Inventory and warehouse management\n• Supplier and customer insights\n• Route optimization and costs\n• Performance analytics\n\nHow can I help you today?',
+    text: `# Hello! 👋
+
+I'm your intelligent **Supply Chain AI Assistant**. I have access to your real-time data and can help you with:
+
+## 🚚 **Shipment Management**
+• Shipment status and tracking  
+• Route optimization and costs
+• Delivery performance analytics
+
+## ⚠️ **Risk Assessment**
+• Active disruptions monitoring
+• Vulnerability analysis
+• Mitigation recommendations
+
+## 📦 **Inventory & Operations**
+• Inventory levels overview
+• Warehouse management
+• Supplier and customer insights
+
+## 📊 **Analytics & Insights**
+• Performance metrics
+• Cost analysis
+• Trend forecasting
+
+**How can I help you today?** 🤔`,
     sender: 'bot',
     timestamp: new Date()
   }
@@ -221,7 +247,32 @@ export default function Chatbot() {
                   >
                     <div className="flex items-start space-x-2">
                       <div className="flex-1">
-                        <p className="text-sm whitespace-pre-line">{message.text}</p>
+                        <div className="text-sm prose prose-invert prose-sm max-w-none">
+                          <ReactMarkdown 
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              // Enhanced colorful styling for markdown elements
+                              h1: ({node, ...props}) => <h1 className="text-lg font-bold mb-3 text-blue-400 border-b border-blue-400/30 pb-1" {...props} />,
+                              h2: ({node, ...props}) => <h2 className="text-base font-semibold mb-2 text-green-400" {...props} />,
+                              h3: ({node, ...props}) => <h3 className="text-sm font-semibold mb-1 text-yellow-400" {...props} />,
+                              p: ({node, ...props}) => <p className="mb-2 leading-relaxed" {...props} />,
+                              ul: ({node, ...props}) => <ul className="list-disc list-inside mb-3 space-y-1 ml-2" {...props} />,
+                              ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-3 space-y-1 ml-2" {...props} />,
+                              li: ({node, ...props}) => <li className="text-sm leading-relaxed" {...props} />,
+                              strong: ({node, ...props}) => <strong className="font-bold text-blue-300" {...props} />,
+                              em: ({node, ...props}) => <em className="italic text-purple-300" {...props} />,
+                              code: ({node, ...props}) => <code className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 px-2 py-1 rounded text-xs font-mono border border-purple-400/30" {...props} />,
+                              pre: ({node, ...props}) => <pre className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 p-3 rounded-lg text-xs font-mono overflow-x-auto border border-gray-600/30 shadow-lg" {...props} />,
+                              blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-gradient-to-b from-blue-400 to-purple-400 pl-4 italic bg-gradient-to-r from-blue-500/10 to-purple-500/10 py-2 rounded-r-lg" {...props} />,
+                              table: ({node, ...props}) => <table className="w-full border-collapse border border-blue-400/30 rounded-lg overflow-hidden" {...props} />,
+                              th: ({node, ...props}) => <th className="border border-blue-400/30 px-3 py-2 text-left font-semibold bg-gradient-to-r from-blue-500/20 to-purple-500/20" {...props} />,
+                              td: ({node, ...props}) => <td className="border border-blue-400/30 px-3 py-2 bg-white/5" {...props} />,
+                              a: ({node, ...props}) => <a className="text-blue-400 hover:text-blue-300 underline decoration-blue-400/50 hover:decoration-blue-300" {...props} />,
+                            }}
+                          >
+                            {message.text}
+                          </ReactMarkdown>
+                        </div>
                         <p className="text-xs opacity-70 mt-1">
                           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>

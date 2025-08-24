@@ -17,6 +17,9 @@ import mcpRoutes from "../routes/mcpRoutes";
 import aiAgentRoutes from "../routes/aiAgentRoutes";
 import vulnerabilityAssessmentRoutes from "../routes/vulnerabilityAssessmentRoutes";
 
+import shipmentTrackingRoutes from "../routes/shipmentTrackingRoutes";
+
+
 const router = Router();
 
 // API Routes
@@ -35,6 +38,9 @@ router.use("/shipment-disruptions", shipmentDisruptionRoutes);
 router.use("/mcp", mcpRoutes);
 router.use("/ai-agent", aiAgentRoutes);
 router.use("/vulnerability-assessment", vulnerabilityAssessmentRoutes);
+
+router.use("/shipment-tracking", shipmentTrackingRoutes);
+
 
 // Health check endpoint
 router.get("/health", (req, res) => {

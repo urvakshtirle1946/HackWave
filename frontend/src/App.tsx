@@ -21,6 +21,7 @@ import UserManagement from './pages/UserManagement';
 import Settings from './pages/Settings';
 import AITest from './pages/AITest';
 import VulnerabilityAssessment from './pages/VulnerabilityAssessment';
+import ShipmentTracking from './pages/ShipmentTracking';
 import './index.css';
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="vulnerability-assessment" element={<VulnerabilityAssessment />} />
           <Route path="ai-test" element={<AITest />} />
+          <Route path="shipment-tracking" element={<ShipmentTracking />} />
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="customers" element={<Customers />} />
           <Route path="port-hubs" element={<PortHubs />} />
