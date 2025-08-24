@@ -11,8 +11,11 @@ import PortHubs from './pages/PortHubs';
 import Warehouses from './pages/Warehouses';
 import Shipments from './pages/Shipments';
 import RoutesPage from './pages/Routes';
+import RouteDefinition from './pages/RouteDefinition';
+import ShipmentCreation from './pages/ShipmentCreation';
+import ShipmentHistory from './pages/ShipmentHistory';
 import RoadFleet from './pages/RoadFleet';
-import AirCargo from './pages/AirCargo';
+// import AirCargo from './pages/AirCargo';
 import RailCargo from './pages/RailCargo';
 import Disruptions from './pages/Disruptions';
 import Inventory from './pages/Inventory';
@@ -38,6 +41,9 @@ function App() {
           <Route path="vulnerability-assessment" element={<VulnerabilityAssessment />} />
           <Route path="ai-test" element={<AITest />} />
           <Route path="shipment-tracking" element={<ShipmentTracking />} />
+          <Route path="shipment-creation" element={<ShipmentCreation />} />
+          <Route path="route-definition" element={<RouteDefinition />} />
+          <Route path="shipment-history" element={<ShipmentHistory />} />
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="customers" element={<Customers />} />
           <Route path="port-hubs" element={<PortHubs />} />
@@ -45,7 +51,7 @@ function App() {
           <Route path="shipments" element={<Shipments />} />
           <Route path="routes" element={<RoutesPage />} />
           <Route path="road-fleet" element={<RoadFleet />} />
-          <Route path="air-cargo" element={<AirCargo />} />
+          {/* <Route path="air-cargo" element={<AirCargo />} /> */}
           <Route path="rail-cargo" element={<RailCargo />} />
           <Route path="disruptions" element={<Disruptions />} />
           <Route path="inventory" element={<Inventory />} />

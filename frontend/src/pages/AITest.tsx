@@ -31,7 +31,7 @@ export default function AITest() {
       setHealth(result);
     } catch (error) {
       console.error('Health check failed:', error);
-      setHealth({ error: error.message });
+      setHealth({ error: error instanceof Error ? error.message : 'Unknown error' });
     }
   };
 
@@ -53,7 +53,7 @@ export default function AITest() {
       }
     } catch (error) {
       console.error('Query failed:', error);
-      setResponse(`Error: ${error.message}`);
+      setResponse(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setResponseType('text');
     } finally {
       setLoading(false);

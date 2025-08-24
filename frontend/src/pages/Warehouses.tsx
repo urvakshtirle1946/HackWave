@@ -29,23 +29,22 @@ export default function Warehouses() {
     { key: 'name', label: 'Name', sortable: true },
     { key: 'country', label: 'Country', sortable: true },
     { key: 'type', label: 'Type', sortable: true, render: (value: string) => value.replace('_', ' ').toUpperCase() },
-    { 
-      key: 'status', 
-      label: 'Status', 
+    {
+      key: 'status',
+      label: 'Status',
       sortable: true,
       render: (value: string) => (
-        <span className={`px-2 py-1 rounded text-xs ${
-          value === 'active' ? 'bg-green-500/20 text-green-400' :
-          value === 'maintenance' ? 'bg-yellow-500/20 text-yellow-400' :
-          'bg-red-500/20 text-red-400'
-        }`}>
+        <span className={`px-2 py-1 rounded text-xs ${value === 'active' ? 'bg-green-500/20 text-green-400' :
+            value === 'maintenance' ? 'bg-yellow-500/20 text-yellow-400' :
+              'bg-red-500/20 text-red-400'
+          }`}>
           {value.toUpperCase()}
         </span>
       )
     },
-    { 
-      key: 'capacity', 
-      label: 'Capacity', 
+    {
+      key: 'capacity',
+      label: 'Capacity',
       sortable: true,
       render: (value: number) => (
         <span className="text-white font-medium">

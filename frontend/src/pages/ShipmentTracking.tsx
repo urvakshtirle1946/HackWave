@@ -7,6 +7,7 @@ import {
   CheckCircle, MapPin, TrendingUp, Calendar, Users, Navigation,
   Eye, EyeOff, RefreshCw, Filter, Search
 } from 'lucide-react';
+import { shipmentsAPI, suppliersAPI, customersAPI } from '../services/api';
 // Define types locally to avoid import issues
 interface ShipmentLocation {
   id: string;
@@ -32,42 +33,24 @@ interface Shipment {
   ETA: string;
   status: string;
   riskScore: number;
-  currentLocation?: ShipmentLocation;
   supplier?: { name: string };
   customer?: { name: string };
 }
 
-// API functions
-const API_BASE = '/api/shipment-tracking';
-
-const shipmentTrackingApi = {
-  async getAllShipments(): Promise<Shipment[]> {
-    const response = await fetch(`${API_BASE}/shipments`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch shipments');
-    }
-    return response.json();
-  },
-
-  getRealTimeUpdates(callback: (shipments: Shipment[]) => void): EventSource {
-    const eventSource = new EventSource(`${API_BASE}/real-time`);
-    
-    eventSource.onmessage = (event) => {
-      try {
-        const shipments = JSON.parse(event.data);
-        callback(shipments);
-      } catch (error) {
-        console.error('Error parsing real-time update:', error);
-      }
-    };
-
-    eventSource.onerror = (error) => {
-      console.error('Real-time update error:', error);
-      eventSource.close();
-    };
-
-    return eventSource;
-  },
+// Generate mock location data for shipments (in real app, this would come from GPS tracking)
+const generateMockLocation = (shipment: Shipment) => {
+  // Generate coordinates based on shipment ID for consistency
+  const seed = parseInt(shipment.id.replace(/[^0-9]/g, '')) || 0;
+  const baseLat = 25.2048 + (seed % 10) * 0.1;
+  const baseLng = 55.2708 + (seed % 10) * 0.1;
+  
+  return {
+    latitude: baseLat + (Math.random() - 0.5) * 0.01,
+    longitude: baseLng + (Math.random() - 0.5) * 0.01,
+    speed: Math.floor(Math.random() * 80) + 20,
+    heading: Math.floor(Math.random() * 360),
+    timestamp: new Date().toISOString()
+  };
 };
 
 // Fix for default markers in Leaflet
@@ -118,9 +101,10 @@ function MapUpdater({ shipments }: { shipments: Shipment[] }) {
   
   useEffect(() => {
     if (shipments.length > 0) {
-      const locations = shipments
-        .filter(s => s.currentLocation)
-        .map(s => [s.currentLocation!.latitude, s.currentLocation!.longitude] as [number, number]);
+      const locations = shipments.map(s => {
+        const location = generateMockLocation(s);
+        return [location.latitude, location.longitude] as [number, number];
+      });
       
       if (locations.length > 0) {
         const bounds = L.latLngBounds(locations);
@@ -134,6 +118,8 @@ function MapUpdater({ shipments }: { shipments: Shipment[] }) {
 
 export default function ShipmentTracking() {
   const [shipments, setShipments] = useState<Shipment[]>([]);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
   const [showAllMarkers, setShowAllMarkers] = useState(true);
@@ -142,16 +128,31 @@ export default function ShipmentTracking() {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
+  const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load initial data
   useEffect(() => {
-    const loadShipments = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await shipmentTrackingApi.getAllShipments();
-        setShipments(data);
+        
+        const [shipmentsData, suppliersData, customersData] = await Promise.all([
+          shipmentsAPI.getAll(),
+          suppliersAPI.getAll(),
+          customersAPI.getAll(),
+        ]);
+
+        // Enrich shipments with supplier and customer data
+        const enrichedShipments = shipmentsData.map((shipment: Shipment) => ({
+          ...shipment,
+          supplier: suppliersData.find((s: any) => s.id === shipment.supplierId),
+          customer: customersData.find((c: any) => c.id === shipment.customerId),
+        }));
+
+        setShipments(enrichedShipments);
+        setSuppliers(suppliersData);
+        setCustomers(customersData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load shipments');
         console.error('Error loading shipments:', err);
@@ -160,27 +161,43 @@ export default function ShipmentTracking() {
       }
     };
 
-    loadShipments();
+    loadData();
   }, []);
 
-  // Set up real-time updates
+  // Set up auto-refresh
   useEffect(() => {
     if (!autoRefresh) {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
       }
       return;
     }
 
-    eventSourceRef.current = shipmentTrackingApi.getRealTimeUpdates((updatedShipments) => {
-      setShipments(updatedShipments);
-    });
+    refreshIntervalRef.current = setInterval(async () => {
+      try {
+        const [shipmentsData, suppliersData, customersData] = await Promise.all([
+          shipmentsAPI.getAll(),
+          suppliersAPI.getAll(),
+          customersAPI.getAll(),
+        ]);
+
+        const enrichedShipments = shipmentsData.map((shipment: Shipment) => ({
+          ...shipment,
+          supplier: suppliersData.find((s: any) => s.id === shipment.supplierId),
+          customer: customersData.find((c: any) => c.id === shipment.customerId),
+        }));
+
+        setShipments(enrichedShipments);
+      } catch (error) {
+        console.error('Error refreshing data:', error);
+      }
+    }, 30000); // Refresh every 30 seconds
 
     return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
       }
     };
   }, [autoRefresh]);
@@ -325,11 +342,12 @@ export default function ShipmentTracking() {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
                 
-                {showAllMarkers && filteredShipments.map((shipment) => 
-                  shipment.currentLocation && (
+                {showAllMarkers && filteredShipments.map((shipment) => {
+                  const location = generateMockLocation(shipment);
+                  return (
                     <Marker
                       key={shipment.id}
-                      position={[shipment.currentLocation.latitude, shipment.currentLocation.longitude]}
+                      position={[location.latitude, location.longitude]}
                       icon={createCustomIcon(shipment.mode)}
                       eventHandlers={{
                         click: () => setSelectedShipment(shipment)
@@ -347,16 +365,14 @@ export default function ShipmentTracking() {
                           <p className="text-sm">
                             ETA: {new Date(shipment.ETA).toLocaleDateString()}
                           </p>
-                          {shipment.currentLocation.speed && (
-                            <p className="text-sm">
-                              Speed: {shipment.currentLocation.speed} km/h
-                            </p>
-                          )}
+                          <p className="text-sm">
+                            Speed: {location.speed} km/h
+                          </p>
                         </div>
                       </Popup>
                     </Marker>
-                  )
-                )}
+                  );
+                })}
                 
                 <MapUpdater shipments={filteredShipments} />
               </MapContainer>
@@ -394,14 +410,12 @@ export default function ShipmentTracking() {
                   <p>ETA: {new Date(shipment.ETA).toLocaleDateString()}</p>
                   <p>Risk: <span className={getRiskColor(shipment.riskScore)}>{shipment.riskScore}%</span></p>
                   
-                  {shipment.currentLocation && (
-                    <div className="flex items-center space-x-1 text-xs">
-                      <MapPin className="h-3 w-3" />
-                      <span>
-                        {shipment.currentLocation.latitude.toFixed(4)}, {shipment.currentLocation.longitude.toFixed(4)}
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex items-center space-x-1 text-xs">
+                    <MapPin className="h-3 w-3" />
+                    <span>
+                      {generateMockLocation(shipment).latitude.toFixed(4)}, {generateMockLocation(shipment).longitude.toFixed(4)}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -457,31 +471,27 @@ export default function ShipmentTracking() {
             </div>
           </div>
           
-          {selectedShipment.currentLocation && (
-            <div className="mt-4 bg-gray-800 p-4 rounded-lg">
-              <h3 className="text-sm font-medium text-gray-400 mb-2">Current Location</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-400">Coordinates:</span>
-                  <p className="text-white">
-                    {selectedShipment.currentLocation.latitude.toFixed(6)}, {selectedShipment.currentLocation.longitude.toFixed(6)}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-gray-400">Last Update:</span>
-                  <p className="text-white">
-                    {new Date(selectedShipment.currentLocation.timestamp).toLocaleString()}
-                  </p>
-                </div>
-                {selectedShipment.currentLocation.speed && (
-                  <div>
-                    <span className="text-gray-400">Speed:</span>
-                    <p className="text-white">{selectedShipment.currentLocation.speed} km/h</p>
-                  </div>
-                )}
+          <div className="mt-4 bg-gray-800 p-4 rounded-lg">
+            <h3 className="text-sm font-medium text-gray-400 mb-2">Current Location</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <span className="text-gray-400">Coordinates:</span>
+                <p className="text-white">
+                  {generateMockLocation(selectedShipment).latitude.toFixed(6)}, {generateMockLocation(selectedShipment).longitude.toFixed(6)}
+                </p>
+              </div>
+              <div>
+                <span className="text-gray-400">Last Update:</span>
+                <p className="text-white">
+                  {new Date().toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <span className="text-gray-400">Speed:</span>
+                <p className="text-white">{generateMockLocation(selectedShipment).speed} km/h</p>
               </div>
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>

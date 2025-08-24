@@ -26,8 +26,11 @@ import {
 
 const navigation = [
   { name: 'Dashboard', href: '/app', icon: LayoutDashboard },
-  { name: 'Shipments', href: '/app/shipments', icon: Package },
+  { name: 'Shipment Creation', href: '/app/shipment-creation', icon: Package },
   { name: 'Shipment Tracking', href: '/app/shipment-tracking', icon: Navigation },
+  { name: 'Route Definition', href: '/app/route-definition', icon: Route },
+  { name: 'Shipment History', href: '/app/shipment-history', icon: BarChart3 },
+  { name: 'Shipments', href: '/app/shipments', icon: Package },
   { name: 'Routes', href: '/app/routes', icon: Route },
   { name: 'Analytics', href: '/app/analytics', icon: Cpu },
   { name: 'Vulnerability Assessment', href: '/app/vulnerability-assessment', icon: ShieldAlert },
@@ -36,14 +39,11 @@ const navigation = [
   // { name: 'Customers', href: '/app/customers', icon: Users },
   { name: 'Port Hubs', href: '/app/port-hubs', icon: Ship },
   { name: 'Warehouses', href: '/app/warehouses', icon: Warehouse },
-
-
   // { name: 'Road Fleet', href: '/app/road-fleet', icon: Truck },
   // { name: 'Air Cargo', href: '/app/air-cargo', icon: Plane },
   // { name: 'Rail Cargo', href: '/app/rail-cargo', icon: Train },
   { name: 'Disruptions', href: '/app/disruptions', icon: AlertTriangle },
   { name: 'Inventory', href: '/app/inventory', icon: BarChart3 },
-
   // { name: 'User Management', href: '/app/user-management', icon: UserPlus },
   // { name: 'Settings', href: '/app/settings', icon: Settings },
 ];
