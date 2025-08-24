@@ -19,6 +19,8 @@ import Inventory from './pages/Inventory';
 import Analytics from './pages/Analytics';
 import UserManagement from './pages/UserManagement';
 import Settings from './pages/Settings';
+import AITest from './pages/AITest';
+import VulnerabilityAssessment from './pages/VulnerabilityAssessment';
 import './index.css';
 
 function App() {
@@ -29,8 +31,11 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/app" element={<Layout />}>
+
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="vulnerability-assessment" element={<VulnerabilityAssessment />} />
+          <Route path="ai-test" element={<AITest />} />
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="customers" element={<Customers />} />
           <Route path="port-hubs" element={<PortHubs />} />

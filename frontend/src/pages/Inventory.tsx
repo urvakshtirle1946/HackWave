@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Edit, Trash2, AlertTriangle, Package, TrendingUp, TrendingDown } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Trash2, AlertTriangle, Package, TrendingUp, TrendingDown, Warehouse, BarChart3, PieChart as PieChartIcon } from 'lucide-react';
 import { inventoryAPI, warehousesAPI } from '../services/api';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell, LineChart, Line, AreaChart, Area
+} from 'recharts';
 
 interface InventoryItem {
   id: string;
@@ -34,11 +38,23 @@ export default function Inventory() {
     reorderPoint: 0,
   });
 
+  // Chart data states
+  const [warehouseData, setWarehouseData] = useState<any[]>([]);
+  const [stockLevelData, setStockLevelData] = useState<any[]>([]);
+  const [categoryData, setCategoryData] = useState<any[]>([]);
+  const [trendData, setTrendData] = useState<any[]>([]);
+
   // Fetch inventory and warehouses on component mount
   useEffect(() => {
     fetchInventory();
     fetchWarehouses();
   }, []);
+
+  useEffect(() => {
+    if (inventory.length > 0 && warehouses.length > 0) {
+      prepareChartData();
+    }
+  }, [inventory, warehouses]);
 
   const fetchInventory = async () => {
     try {
@@ -61,6 +77,64 @@ export default function Inventory() {
     } catch (err) {
       console.error('Error fetching warehouses:', err);
     }
+  };
+
+  const prepareChartData = () => {
+    // Warehouse distribution
+    const warehouseCount = inventory.reduce((acc, item) => {
+      const warehouse = warehouses.find(w => w.id === item.warehouseId);
+      const warehouseName = warehouse?.name || 'Unknown';
+      acc[warehouseName] = (acc[warehouseName] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const warehouseChartData = Object.entries(warehouseCount).map(([name, count]) => ({
+      name,
+      value: count,
+      fill: `hsl(${Math.random() * 360}, 70%, 50%)`
+    }));
+
+    // Stock level distribution
+    const stockLevels = inventory.map(item => {
+      const status = getStockStatus(item);
+      return {
+        name: item.productName,
+        quantity: item.quantity,
+        reorderPoint: item.reorderPoint,
+        status,
+        fill: status === 'low' ? '#EF4444' : 
+              status === 'high' ? '#F59E0B' : '#10B981'
+      };
+    }).sort((a, b) => b.quantity - a.quantity).slice(0, 10);
+
+    // Category analysis (by product name patterns)
+    const categoryCount = inventory.reduce((acc, item) => {
+      const category = item.productName.split(' ')[0] || 'Other';
+      acc[category] = (acc[category] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const categoryChartData = Object.entries(categoryCount)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 8)
+      .map(([category, count]) => ({
+        category,
+        count,
+        fill: `hsl(${Math.random() * 360}, 70%, 50%)`
+      }));
+
+    // Trend data (mock data for demonstration)
+    const trendChartData = Array.from({ length: 12 }, (_, i) => ({
+      month: new Date(2024, i, 1).toLocaleDateString('en-US', { month: 'short' }),
+      totalItems: Math.floor(Math.random() * 100) + 50,
+      lowStock: Math.floor(Math.random() * 20) + 5,
+      value: Math.floor(Math.random() * 100000) + 50000
+    }));
+
+    setWarehouseData(warehouseChartData);
+    setStockLevelData(stockLevels);
+    setCategoryData(categoryChartData);
+    setTrendData(trendChartData);
   };
 
   const handleCreateItem = async () => {
@@ -193,7 +267,7 @@ export default function Inventory() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Inventory Management</h1>
+          <h1 className="text-3xl font-bold text-white">Inventory Management</h1>
           <p className="text-white/70">Manage warehouse inventory and stock levels</p>
         </div>
         <button
@@ -203,6 +277,157 @@ export default function Inventory() {
           <Plus className="h-4 w-4" />
           <span>Add Item</span>
         </button>
+      </div>
+
+      {/* Enhanced KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-lg p-6 border border-blue-500/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-blue-300 text-sm font-medium">Total Items</p>
+              <p className="text-2xl font-bold text-white">{inventory.length}</p>
+            </div>
+            <Package className="h-8 w-8 text-blue-400" />
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-red-500/20 to-red-600/20 rounded-lg p-6 border border-red-500/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-red-300 text-sm font-medium">Low Stock Items</p>
+              <p className="text-2xl font-bold text-white">{lowStockItems.length}</p>
+            </div>
+            <AlertTriangle className="h-8 w-8 text-red-400" />
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-purple-500/20 to-purple-600/20 rounded-lg p-6 border border-purple-500/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-purple-300 text-sm font-medium">Warehouses</p>
+              <p className="text-2xl font-bold text-white">{warehouses.length}</p>
+            </div>
+            <Warehouse className="h-8 w-8 text-purple-400" />
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-green-500/20 to-green-600/20 rounded-lg p-6 border border-green-500/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-green-300 text-sm font-medium">Total Value</p>
+              <p className="text-2xl font-bold text-white">
+                ${inventory.reduce((sum, item) => sum + (item.quantity * 100), 0).toLocaleString()}
+              </p>
+            </div>
+            <TrendingUp className="h-8 w-8 text-green-400" />
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Warehouse Distribution */}
+        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+            <Warehouse className="h-5 w-5 text-blue-400" />
+            <span>Inventory by Warehouse</span>
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={warehouseData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, value }) => `${name} (${value})`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {warehouseData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Stock Level Analysis */}
+        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+            <BarChart3 className="h-5 w-5 text-green-400" />
+            <span>Top 10 Items by Quantity</span>
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={stockLevelData} layout="horizontal">
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+              <XAxis type="number" stroke="#ffffff70" />
+              <YAxis dataKey="name" type="category" stroke="#ffffff70" width={100} />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1f2937', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#ffffff'
+                }}
+              />
+              <Bar dataKey="quantity" fill="#10B981" radius={[0, 4, 4, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Additional Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Category Distribution */}
+        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+            <PieChartIcon className="h-5 w-5 text-purple-400" />
+            <span>Product Categories</span>
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={categoryData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+              <XAxis dataKey="category" stroke="#ffffff70" />
+              <YAxis stroke="#ffffff70" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1f2937', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#ffffff'
+                }}
+              />
+              <Bar dataKey="count" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Inventory Trends */}
+        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+            <TrendingUp className="h-5 w-5 text-orange-400" />
+            <span>Monthly Inventory Trends</span>
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={trendData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+              <XAxis dataKey="month" stroke="#ffffff70" />
+              <YAxis stroke="#ffffff70" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1f2937', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#ffffff'
+                }}
+              />
+              <Area type="monotone" dataKey="totalItems" stackId="1" stroke="#F59E0B" fill="#F59E0B" fillOpacity={0.6} />
+              <Area type="monotone" dataKey="lowStock" stackId="1" stroke="#EF4444" fill="#EF4444" fillOpacity={0.6} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Error Display */}

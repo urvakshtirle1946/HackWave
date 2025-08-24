@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Edit, Trash2, Eye, MapPin, Truck, Plane, Train, Ship } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Trash2, Eye, MapPin, Truck, Plane, Train, Ship, TrendingUp, DollarSign, Clock, Route } from 'lucide-react';
 import { routesAPI } from '../services/api';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell, LineChart, Line, AreaChart, Area
+} from 'recharts';
 
 interface Route {
   id: string;
@@ -43,10 +47,22 @@ export default function Routes() {
     costEst: 0,
   });
 
+  // Chart data states
+  const [modeData, setModeData] = useState<any[]>([]);
+  const [costData, setCostData] = useState<any[]>([]);
+  const [timeData, setTimeData] = useState<any[]>([]);
+  const [carrierData, setCarrierData] = useState<any[]>([]);
+
   // Fetch routes on component mount
   useEffect(() => {
     fetchRoutes();
   }, []);
+
+  useEffect(() => {
+    if (routes.length > 0) {
+      prepareChartData();
+    }
+  }, [routes]);
 
   const fetchRoutes = async () => {
     try {
@@ -60,6 +76,81 @@ export default function Routes() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const prepareChartData = () => {
+    // Transport mode distribution
+    const modeCount = routes.reduce((acc, route) => {
+      acc[route.mode] = (acc[route.mode] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const modeChartData = Object.entries(modeCount).map(([mode, count]) => ({
+      name: mode.toUpperCase(),
+      value: count,
+      fill: mode === 'sea' ? '#3B82F6' : 
+            mode === 'air' ? '#8B5CF6' : 
+            mode === 'road' ? '#10B981' : 
+            mode === 'rail' ? '#F59E0B' : '#6B7280'
+    }));
+
+    // Cost analysis by mode
+    const costByMode = routes.reduce((acc, route) => {
+      if (!acc[route.mode]) {
+        acc[route.mode] = { total: 0, count: 0, avg: 0 };
+      }
+      acc[route.mode].total += route.costEst;
+      acc[route.mode].count += 1;
+      acc[route.mode].avg = acc[route.mode].total / acc[route.mode].count;
+      return acc;
+    }, {} as Record<string, { total: number; count: number; avg: number }>);
+
+    const costChartData = Object.entries(costByMode).map(([mode, data]) => ({
+      mode: mode.toUpperCase(),
+      average: Math.round(data.avg),
+      total: Math.round(data.total),
+      count: data.count
+    }));
+
+    // Time analysis by mode
+    const timeByMode = routes.reduce((acc, route) => {
+      if (!acc[route.mode]) {
+        acc[route.mode] = { total: 0, count: 0, avg: 0 };
+      }
+      acc[route.mode].total += route.travelTimeEst;
+      acc[route.mode].count += 1;
+      acc[route.mode].avg = acc[route.mode].total / acc[route.mode].count;
+      return acc;
+    }, {} as Record<string, { total: number; count: number; avg: number }>);
+
+    const timeChartData = Object.entries(timeByMode).map(([mode, data]) => ({
+      mode: mode.toUpperCase(),
+      average: Math.round(data.avg),
+      total: data.total,
+      count: data.count
+    }));
+
+    // Top carriers by cost
+    const carrierCosts = routes.reduce((acc, route) => {
+      if (!acc[route.carrierName]) {
+        acc[route.carrierName] = 0;
+      }
+      acc[route.carrierName] += route.costEst;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const topCarriers = Object.entries(carrierCosts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 5)
+      .map(([carrier, cost]) => ({
+        carrier,
+        cost: Math.round(cost)
+      }));
+
+    setModeData(modeChartData);
+    setCostData(costChartData);
+    setTimeData(timeChartData);
+    setCarrierData(topCarriers);
   };
 
   const handleCreateRoute = async () => {
@@ -198,7 +289,7 @@ export default function Routes() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Routes Management</h1>
+          <h1 className="text-3xl font-bold text-white">Routes Management</h1>
           <p className="text-white/70">Manage transportation routes and logistics paths</p>
         </div>
         <button
@@ -208,6 +299,160 @@ export default function Routes() {
           <Plus className="h-4 w-4" />
           <span>Add Route</span>
         </button>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-lg p-6 border border-blue-500/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-blue-300 text-sm font-medium">Total Routes</p>
+              <p className="text-2xl font-bold text-white">{routes.length}</p>
+            </div>
+            <Route className="h-8 w-8 text-blue-400" />
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-green-500/20 to-green-600/20 rounded-lg p-6 border border-green-500/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-green-300 text-sm font-medium">Total Cost</p>
+              <p className="text-2xl font-bold text-white">
+                ${routes.reduce((sum, r) => sum + r.costEst, 0).toLocaleString()}
+              </p>
+            </div>
+            <DollarSign className="h-8 w-8 text-green-400" />
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-purple-500/20 to-purple-600/20 rounded-lg p-6 border border-purple-500/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-purple-300 text-sm font-medium">Avg Travel Time</p>
+              <p className="text-2xl font-bold text-white">
+                {routes.length > 0 ? Math.round(routes.reduce((sum, r) => sum + r.travelTimeEst, 0) / routes.length) : 0}h
+              </p>
+            </div>
+            <Clock className="h-8 w-8 text-purple-400" />
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-orange-500/20 to-orange-600/20 rounded-lg p-6 border border-orange-500/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-orange-300 text-sm font-medium">Unique Carriers</p>
+              <p className="text-2xl font-bold text-white">
+                {new Set(routes.map(r => r.carrierName)).size}
+              </p>
+            </div>
+            <Truck className="h-8 w-8 text-orange-400" />
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Transport Mode Distribution */}
+        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+            <Route className="h-5 w-5 text-blue-400" />
+            <span>Transport Mode Distribution</span>
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={modeData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, value }) => `${name} (${value})`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {modeData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Cost Analysis by Mode */}
+        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+            <DollarSign className="h-5 w-5 text-green-400" />
+            <span>Cost Analysis by Transport Mode</span>
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={costData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+              <XAxis dataKey="mode" stroke="#ffffff70" />
+              <YAxis stroke="#ffffff70" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1f2937', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#ffffff'
+                }}
+              />
+              <Bar dataKey="average" fill="#10B981" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Additional Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Travel Time Analysis */}
+        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+            <Clock className="h-5 w-5 text-purple-400" />
+            <span>Travel Time by Mode</span>
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={timeData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+              <XAxis dataKey="mode" stroke="#ffffff70" />
+              <YAxis stroke="#ffffff70" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1f2937', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#ffffff'
+                }}
+              />
+              <Bar dataKey="average" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Top Carriers by Cost */}
+        <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+            <Truck className="h-5 w-5 text-orange-400" />
+            <span>Top Carriers by Total Cost</span>
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={carrierData} layout="horizontal">
+              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+              <XAxis type="number" stroke="#ffffff70" />
+              <YAxis dataKey="carrier" type="category" stroke="#ffffff70" width={80} />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1f2937', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#ffffff'
+                }}
+              />
+              <Bar dataKey="cost" fill="#F59E0B" radius={[0, 4, 4, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Error Display */}

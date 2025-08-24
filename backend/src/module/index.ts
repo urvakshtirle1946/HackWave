@@ -14,6 +14,8 @@ import disruptionRoutes from "./disruptions/routes";
 import inventoryRoutes from "./inventory/routes";
 import shipmentDisruptionRoutes from "./shipment-disruptions/routes";
 import mcpRoutes from "../routes/mcpRoutes";
+import aiAgentRoutes from "../routes/aiAgentRoutes";
+import vulnerabilityAssessmentRoutes from "../routes/vulnerabilityAssessmentRoutes";
 
 const router = Router();
 
@@ -31,6 +33,8 @@ router.use("/disruptions", disruptionRoutes);
 router.use("/inventory", inventoryRoutes);
 router.use("/shipment-disruptions", shipmentDisruptionRoutes);
 router.use("/mcp", mcpRoutes);
+router.use("/ai-agent", aiAgentRoutes);
+router.use("/vulnerability-assessment", vulnerabilityAssessmentRoutes);
 
 // Health check endpoint
 router.get("/health", (req, res) => {

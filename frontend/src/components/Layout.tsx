@@ -25,20 +25,25 @@ import {
 
 const navigation = [
   { name: 'Dashboard', href: '/app', icon: LayoutDashboard },
-  { name: 'Suppliers', href: '/app/suppliers', icon: Building2 },
-  { name: 'Customers', href: '/app/customers', icon: Users },
-  { name: 'Port Hubs', href: '/app/port-hubs', icon: Ship },
-  { name: 'Warehouses', href: '/app/warehouses', icon: Warehouse },
   { name: 'Shipments', href: '/app/shipments', icon: Package },
   { name: 'Routes', href: '/app/routes', icon: Route },
-  { name: 'Road Fleet', href: '/app/road-fleet', icon: Truck },
-  { name: 'Air Cargo', href: '/app/air-cargo', icon: Plane },
-  { name: 'Rail Cargo', href: '/app/rail-cargo', icon: Train },
+  { name: 'Analytics', href: '/app/analytics', icon: Cpu },
+  { name: 'Vulnerability Assessment', href: '/app/vulnerability-assessment', icon: ShieldAlert },
+  { name: 'AI Test', href: '/app/ai-test', icon: Cpu },
+  { name: 'Suppliers', href: '/app/suppliers', icon: Building2 },
+  // { name: 'Customers', href: '/app/customers', icon: Users },
+  { name: 'Port Hubs', href: '/app/port-hubs', icon: Ship },
+  { name: 'Warehouses', href: '/app/warehouses', icon: Warehouse },
+
+
+  // { name: 'Road Fleet', href: '/app/road-fleet', icon: Truck },
+  // { name: 'Air Cargo', href: '/app/air-cargo', icon: Plane },
+  // { name: 'Rail Cargo', href: '/app/rail-cargo', icon: Train },
   { name: 'Disruptions', href: '/app/disruptions', icon: AlertTriangle },
   { name: 'Inventory', href: '/app/inventory', icon: BarChart3 },
-  { name: 'Analytics', href: '/app/analytics', icon: Cpu },
-  { name: 'User Management', href: '/app/user-management', icon: UserPlus },
-  { name: 'Settings', href: '/app/settings', icon: Settings },
+
+  // { name: 'User Management', href: '/app/user-management', icon: UserPlus },
+  // { name: 'Settings', href: '/app/settings', icon: Settings },
 ];
 
 export default function Layout() {
@@ -147,12 +152,12 @@ export default function Layout() {
           </div>
         </div>
 
-                 {/* Page content */}
-         <main className="py-6">
-           <div className="px-4 sm:px-6 lg:px-8">
-             <Outlet />
-           </div>
-         </main>
+        {/* Page content */}
+        <main className="py-6">
+          <div className="px-4 sm:px-6 lg:px-8">
+            <Outlet />
+          </div>
+        </main>
       </div>
     </div>
   );

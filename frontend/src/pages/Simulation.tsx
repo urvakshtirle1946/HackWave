@@ -1,557 +1,533 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, RotateCcw, Settings, BarChart3, TrendingUp, AlertTriangle, CheckCircle, Clock, Plus, X } from 'lucide-react';
-import { simulationAPI } from '../services/api';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  AreaChart,
+  Area,
+  ComposedChart,
+  ScatterChart,
+  Scatter
+} from 'recharts';
+import { 
+  Play, 
+  Pause, 
+  RotateCcw, 
+  Settings, 
+  TrendingUp, 
+  TrendingDown, 
+  Activity,
+  Clock,
+  DollarSign,
+  Package,
+  Truck,
+  Ship,
+  Plane,
+  Train,
+  CheckCircle,
+  AlertTriangle,
+  Target,
+  Zap,
+  BarChart3
+} from 'lucide-react';
 
-interface SimulationScenario {
-  id: string;
+interface SimulationData {
   name: string;
-  description: string;
-  status: 'running' | 'completed' | 'queued' | 'paused' | 'failed';
-  progress: number;
-  duration: string;
-  riskLevel: 'High' | 'Medium' | 'Low';
-  costImpact: string;
-  completion: string;
-  scenarioType: string;
-  scenarioParams?: any;
-  result?: any;
+  value: number;
+  [key: string]: any;
 }
-
-interface SimulationResult {
-  metrics: Array<{
-    name: string;
-    current: number;
-    simulated: number;
-    change: number;
-  }>;
-  recommendations: Array<{
-    id: number;
-    type: 'warning' | 'info' | 'success';
-    message: string;
-    impact: string;
-  }>;
-}
-
-const defaultScenarios = [
-  {
-    id: 'port-closure',
-    name: 'Port Closure Simulation',
-    description: 'Simulate major port closure impact on supply chain',
-    scenarioType: 'port_closure',
-    scenarioParams: {
-      portName: 'Port of Singapore',
-      closureDuration: 48,
-      reason: 'Technical Issues'
-    }
-  },
-  {
-    id: 'weather-event',
-    name: 'Weather Event Simulation',
-    description: 'Simulate severe weather impact on transportation',
-    scenarioType: 'weather_event',
-    scenarioParams: {
-      eventType: 'Tropical Storm',
-      location: 'Singapore',
-      duration: 24
-    }
-  },
-  {
-    id: 'geopolitical-crisis',
-    name: 'Geopolitical Crisis Simulation',
-    description: 'Simulate trade tensions and route disruptions',
-    scenarioType: 'geopolitical_crisis',
-    scenarioParams: {
-      crisisType: 'Trade Tensions',
-      region: 'Asia-Pacific',
-      duration: 72
-    }
-  },
-  {
-    id: 'demand-surge',
-    name: 'Demand Surge Simulation',
-    description: 'Test capacity during peak demand periods',
-    scenarioType: 'demand_surge',
-    scenarioParams: {
-      demandIncrease: 50,
-      duration: 30
-    }
-  }
-];
 
 export default function Simulation() {
-  const [scenarios, setScenarios] = useState<SimulationScenario[]>([]);
-  const [activeScenario, setActiveScenario] = useState<string | null>(null);
-  const [isSimulating, setIsSimulating] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showNewScenarioModal, setShowNewScenarioModal] = useState(false);
-  const [newScenario, setNewScenario] = useState({
-    name: '',
-    description: '',
-    scenarioType: '',
-    scenarioParams: {}
-  });
+  const [loading, setLoading] = useState(true);
+  const [isRunning, setIsRunning] = useState(false);
+  const [currentScenario, setCurrentScenario] = useState('baseline');
+  const [simulationResults, setSimulationResults] = useState<SimulationData[]>([]);
+  const [scenarioComparison, setScenarioComparison] = useState<SimulationData[]>([]);
+  const [costAnalysis, setCostAnalysis] = useState<SimulationData[]>([]);
+  const [performanceMetrics, setPerformanceMetrics] = useState<SimulationData[]>([]);
+  const [optimizationResults, setOptimizationResults] = useState<SimulationData[]>([]);
 
-  // Initialize with default scenarios
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
+
   useEffect(() => {
-    const initialScenarios = defaultScenarios.map(scenario => ({
-      ...scenario,
-      status: 'queued' as const,
-      progress: 0,
-      duration: '0h 0m',
-      riskLevel: 'Medium' as const,
-      costImpact: '$0',
-      completion: '0%'
-    }));
-    setScenarios(initialScenarios);
-  }, []);
+    const generateMockSimulationData = () => {
+      // Generate simulation results data
+      const resultsData = [];
+      const now = new Date();
+      for (let i = 0; i < 24; i++) {
+        const hour = i;
+        const baseEfficiency = 75 + Math.random() * 20;
+        const baseCost = 1000 + Math.random() * 500;
+        
+        resultsData.push({
+          name: `${hour}:00`,
+          efficiency: Math.round(baseEfficiency),
+          cost: Math.round(baseCost),
+          throughput: Math.round(50 + Math.random() * 30),
+          delays: Math.round(Math.random() * 10)
+        });
+      }
+      setSimulationResults(resultsData);
 
-  const runSimulation = async (scenarioId: string) => {
-    const scenario = scenarios.find(s => s.id === scenarioId);
-    if (!scenario) return;
+      // Generate scenario comparison data
+      const comparisonData = [
+        { name: 'Baseline', cost: 100, efficiency: 75, throughput: 100, risk: 50 },
+        { name: 'Optimized Routes', cost: 85, efficiency: 88, throughput: 115, risk: 35 },
+        { name: 'Multi-modal', cost: 92, efficiency: 82, throughput: 125, risk: 40 },
+        { name: 'AI-Powered', cost: 78, efficiency: 92, throughput: 140, risk: 25 },
+        { name: 'Green Initiative', cost: 95, efficiency: 78, throughput: 110, risk: 30 }
+      ];
+      setScenarioComparison(comparisonData);
 
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Update scenario status to running
-      setScenarios(prev => prev.map(s => 
-        s.id === scenarioId 
-          ? { ...s, status: 'running', progress: 0, completion: '0%' }
-          : s
-      ));
+      // Generate cost analysis data
+      const costData = [];
+      for (let i = 0; i < 12; i++) {
+        const month = i + 1;
+        const baseCost = 80000 + Math.random() * 40000;
+        
+        costData.push({
+          name: `Month ${month}`,
+          baseline: Math.round(baseCost),
+          optimized: Math.round(baseCost * 0.85 + Math.random() * 10000),
+          savings: Math.round(baseCost * 0.15 + Math.random() * 5000)
+        });
+      }
+      setCostAnalysis(costData);
 
-      // Simulate progress updates
-      const progressInterval = setInterval(() => {
-        setScenarios(prev => prev.map(s => {
-          if (s.id === scenarioId && s.status === 'running' && s.progress < 90) {
-            return { ...s, progress: s.progress + Math.random() * 10, completion: `${Math.min(s.progress + 10, 90)}%` };
-          }
-          return s;
-        }));
-      }, 1000);
+      // Generate performance metrics data
+      const performanceData = [
+        { name: 'On-Time Delivery', baseline: 75, optimized: 92, target: 95 },
+        { name: 'Cost per Shipment', baseline: 100, optimized: 78, target: 70 },
+        { name: 'Inventory Turnover', baseline: 4, optimized: 6.5, target: 8 },
+        { name: 'Order Accuracy', baseline: 88, optimized: 96, target: 99 },
+        { name: 'Lead Time', baseline: 100, baseline: 72, target: 60 }
+      ];
+      setPerformanceMetrics(performanceData);
 
-      // Call the AI agent simulation API
-      const result = await simulationAPI.runScenario(scenario.scenarioType, scenario.scenarioParams);
-      
-      clearInterval(progressInterval);
+      // Generate optimization results data
+      const optimizationData = [
+        { name: 'Route Optimization', current: 100, optimized: 78, savings: 22, roi: 340 },
+        { name: 'Inventory Management', current: 100, optimized: 82, savings: 18, roi: 280 },
+        { name: 'Supplier Consolidation', current: 100, optimized: 85, savings: 15, roi: 220 },
+        { name: 'Automation', current: 100, optimized: 72, savings: 28, roi: 420 },
+        { name: 'Predictive Analytics', current: 100, optimized: 88, savings: 12, roi: 180 }
+      ];
+      setOptimizationResults(optimizationData);
 
-      // Update scenario with results
-      setScenarios(prev => prev.map(s => 
-        s.id === scenarioId 
-          ? { 
-              ...s, 
-              status: 'completed', 
-              progress: 100, 
-              completion: '100%',
-              result: result.data,
-              duration: `${Math.floor(Math.random() * 3) + 1}h ${Math.floor(Math.random() * 60)}m`,
-              costImpact: `$${(Math.random() * 3 + 0.5).toFixed(1)}M`
-            }
-          : s
-      ));
-
-      setActiveScenario(null);
-    } catch (err) {
-      console.error('Simulation error:', err);
-      setError('Failed to run simulation');
-      
-      setScenarios(prev => prev.map(s => 
-        s.id === scenarioId 
-          ? { ...s, status: 'failed', progress: 0, completion: '0%' }
-          : s
-      ));
-    } finally {
       setLoading(false);
-    }
-  };
-
-  const pauseSimulation = (scenarioId: string) => {
-    setScenarios(prev => prev.map(s => 
-      s.id === scenarioId 
-        ? { ...s, status: 'paused' }
-        : s
-    ));
-  };
-
-  const resumeSimulation = (scenarioId: string) => {
-    setScenarios(prev => prev.map(s => 
-      s.id === scenarioId 
-        ? { ...s, status: 'running' }
-        : s
-    ));
-  };
-
-  const stopSimulation = (scenarioId: string) => {
-    setScenarios(prev => prev.map(s => 
-      s.id === scenarioId 
-        ? { ...s, status: 'queued', progress: 0, completion: '0%' }
-        : s
-    ));
-  };
-
-  const resetAllSimulations = () => {
-    setScenarios(prev => prev.map(s => ({
-      ...s,
-      status: 'queued',
-      progress: 0,
-      completion: '0%',
-      result: undefined
-    })));
-  };
-
-  const addNewScenario = () => {
-    if (!newScenario.name || !newScenario.description || !newScenario.scenarioType) {
-      setError('Please fill in all required fields');
-      return;
-    }
-
-    const scenario: SimulationScenario = {
-      id: `custom-${Date.now()}`,
-      name: newScenario.name,
-      description: newScenario.description,
-      scenarioType: newScenario.scenarioType,
-      scenarioParams: newScenario.scenarioParams,
-      status: 'queued',
-      progress: 0,
-      duration: '0h 0m',
-      riskLevel: 'Medium',
-      costImpact: '$0',
-      completion: '0%'
     };
 
-    setScenarios(prev => [...prev, scenario]);
-    setShowNewScenarioModal(false);
-    setNewScenario({ name: '', description: '', scenarioType: '', scenarioParams: {} });
-    setError(null);
+    // Simulate API call delay
+    setTimeout(generateMockSimulationData, 1000);
+  }, []);
+
+  const handleStartSimulation = () => {
+    setIsRunning(true);
+    // Simulate simulation running
+    setTimeout(() => setIsRunning(false), 5000);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'running': return 'text-blue-400';
-      case 'completed': return 'text-green-400';
-      case 'queued': return 'text-yellow-400';
-      case 'paused': return 'text-orange-400';
-      case 'failed': return 'text-red-400';
-      default: return 'text-gray-400';
-    }
+  const handleStopSimulation = () => {
+    setIsRunning(false);
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'running': return Play;
-      case 'completed': return CheckCircle;
-      case 'queued': return Clock;
-      case 'paused': return Pause;
-      case 'failed': return AlertTriangle;
-      default: return Clock;
-    }
+  const handleResetSimulation = () => {
+    // Reset simulation data
+    setIsRunning(false);
   };
 
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case 'High': return 'text-red-400';
-      case 'Medium': return 'text-yellow-400';
-      case 'Low': return 'text-green-400';
-      default: return 'text-gray-400';
-    }
-  };
-
-  const completedScenarios = scenarios.filter(s => s.status === 'completed' && s.result);
-  const latestResult = completedScenarios[completedScenarios.length - 1]?.result;
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-white/10 rounded w-1/3 mb-6"></div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white/5 rounded-lg p-6 border border-white/10 h-80">
+                <div className="h-6 bg-white/10 rounded w-1/2 mb-4"></div>
+                <div className="h-48 bg-white/10 rounded"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Supply Chain Simulation</h1>
-          <p className="text-white/70">Test scenarios and optimize your supply chain performance</p>
-        </div>
-        <div className="flex space-x-3">
-          <button 
-            onClick={() => setShowNewScenarioModal(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>New Scenario</span>
-          </button>
-          <button className="px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors flex items-center space-x-2">
-            <Settings className="h-4 w-4" />
-            <span>Settings</span>
-          </button>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-white">Supply Chain Simulation & Optimization</h1>
+        <div className="flex items-center space-x-2 text-sm text-white/70">
+          <Activity className="h-4 w-4" />
+          <span>Last updated: {new Date().toLocaleDateString()}</span>
         </div>
       </div>
 
-      {/* Error Display */}
-      {error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
-          <p className="text-red-400">{error}</p>
-        </div>
-      )}
-
-      {/* Simulation Status */}
+      {/* Simulation Controls */}
       <div className="bg-white/5 rounded-lg p-6 border border-white/10 backdrop-blur">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">Active Simulations</h3>
-          <div className="flex items-center space-x-2">
-            <div className={`w-3 h-3 rounded-full ${isSimulating ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
-            <span className="text-sm text-white/70">
-              {isSimulating ? 'Simulation Engine Active' : 'Simulation Engine Idle'}
-            </span>
+          <h3 className="text-lg font-semibold text-white">Simulation Controls</h3>
+          <div className="flex items-center space-x-4">
+            <select
+              value={currentScenario}
+              onChange={(e) => setCurrentScenario(e.target.value)}
+              className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm"
+            >
+              <option value="baseline">Baseline Scenario</option>
+              <option value="optimized">Optimized Routes</option>
+              <option value="multimodal">Multi-modal Transport</option>
+              <option value="ai">AI-Powered Optimization</option>
+              <option value="green">Green Initiative</option>
+            </select>
+            <button
+              onClick={handleStartSimulation}
+              disabled={isRunning}
+              className="flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 rounded-lg text-white text-sm"
+            >
+              <Play className="h-4 w-4 mr-2" />
+              {isRunning ? 'Running...' : 'Start Simulation'}
+            </button>
+            <button
+              onClick={handleStopSimulation}
+              disabled={!isRunning}
+              className="flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 rounded-lg text-white text-sm"
+            >
+              <Pause className="h-4 w-4 mr-2" />
+              Stop
+            </button>
+            <button
+              onClick={handleResetSimulation}
+              className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white text-sm"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reset
+            </button>
           </div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {scenarios.map((scenario) => {
-            const StatusIcon = getStatusIcon(scenario.status);
-            return (
-              <div key={scenario.id} className="bg-white/5 rounded-lg p-4 border border-white/10">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-sm font-medium text-white">{scenario.name}</h4>
-                  <StatusIcon className={`h-4 w-4 ${getStatusColor(scenario.status)}`} />
-                </div>
-                
-                <p className="text-xs text-white/70 mb-3">{scenario.description}</p>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/70">Progress:</span>
-                    <span className="text-white">{scenario.completion}</span>
-                  </div>
-                  <div className="w-full bg-white/10 rounded-full h-2">
-                    <div 
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        scenario.status === 'failed' ? 'bg-red-500' : 'bg-blue-500'
-                      }`}
-                      style={{ width: `${scenario.progress}%` }}
-                    />
-                  </div>
-                </div>
-                
-                <div className="mt-3 space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/70">Duration:</span>
-                    <span className="text-white">{scenario.duration}</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/70">Risk:</span>
-                    <span className={getRiskColor(scenario.riskLevel)}>{scenario.riskLevel}</span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white/70">Cost Impact:</span>
-                    <span className="text-white">{scenario.costImpact}</span>
-                  </div>
-                </div>
-                
-                <div className="mt-3 flex space-x-2">
-                  {scenario.status === 'running' && (
-                    <>
-                      <button 
-                        onClick={() => pauseSimulation(scenario.id)}
-                        className="flex-1 px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 transition-colors"
-                      >
-                        Pause
-                      </button>
-                      <button 
-                        onClick={() => stopSimulation(scenario.id)}
-                        className="flex-1 px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
-                      >
-                        Stop
-                      </button>
-                    </>
-                  )}
-                  {scenario.status === 'paused' && (
-                    <button 
-                      onClick={() => resumeSimulation(scenario.id)}
-                      className="w-full px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
-                    >
-                      Resume
-                    </button>
-                  )}
-                  {scenario.status === 'queued' && (
-                    <button 
-                      onClick={() => runSimulation(scenario.id)}
-                      disabled={loading}
-                      className="w-full px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors disabled:opacity-50"
-                    >
-                      {loading ? 'Starting...' : 'Start'}
-                    </button>
-                  )}
-                  {scenario.status === 'failed' && (
-                    <button 
-                      onClick={() => runSimulation(scenario.id)}
-                      className="w-full px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
-                    >
-                      Retry
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+            <div className="flex items-center space-x-2 mb-2">
+              <Target className="h-4 w-4 text-blue-400" />
+              <span className="text-sm text-white/70">Current Scenario</span>
+            </div>
+            <p className="text-lg font-semibold text-white capitalize">{currentScenario.replace('-', ' ')}</p>
+          </div>
+          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+            <div className="flex items-center space-x-2 mb-2">
+              <Clock className="h-4 w-4 text-green-400" />
+              <span className="text-sm text-white/70">Simulation Time</span>
+            </div>
+            <p className="text-lg font-semibold text-white">{isRunning ? 'Running...' : 'Ready'}</p>
+          </div>
+          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+            <div className="flex items-center space-x-2 mb-2">
+              <Zap className="h-4 w-4 text-yellow-400" />
+              <span className="text-sm text-white/70">Performance</span>
+            </div>
+            <p className="text-lg font-semibold text-white">92.5%</p>
+          </div>
+          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+            <div className="flex items-center space-x-2 mb-2">
+              <DollarSign className="h-4 w-4 text-green-400" />
+              <span className="text-sm text-white/70">Cost Savings</span>
+            </div>
+            <p className="text-lg font-semibold text-white">$2.4M</p>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Simulation Results */}
-        {latestResult && (
-          <div className="bg-white/5 rounded-lg p-6 border border-white/10 backdrop-blur">
-            <h3 className="text-lg font-semibold text-white mb-4">Latest Simulation Results</h3>
-            <div className="space-y-4">
-              {latestResult.summary && (
-                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                  <h4 className="text-sm font-medium text-white mb-2">Scenario Summary</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Scenario:</span>
-                      <span className="text-white">{latestResult.summary.scenarioName}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Affected Shipments:</span>
-                      <span className="text-white">{latestResult.summary.affectedShipments}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Total Delay:</span>
-                      <span className="text-white">{latestResult.summary.totalDelay} hours</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Cost Increase:</span>
-                      <span className="text-white">${latestResult.summary.totalCostIncrease?.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-white/70">Risk Level:</span>
-                      <span className={getRiskColor(latestResult.summary.riskLevel)}>{latestResult.summary.riskLevel}</span>
-                    </div>
-                  </div>
+        {/* Real-time Simulation Results */}
+        <div className="bg-white/5 rounded-lg p-6 border border-white/10 backdrop-blur">
+          <h3 className="text-lg font-semibold text-white mb-4">Real-time Simulation Results</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <ComposedChart data={simulationResults}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="name" stroke="#9CA3AF" />
+              <YAxis stroke="#9CA3AF" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1F2937', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#F9FAFB'
+                }}
+              />
+              <Legend />
+              <Line 
+                type="monotone" 
+                dataKey="efficiency" 
+                stroke="#10B981" 
+                strokeWidth={3}
+                dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6 }}
+              />
+              <Bar dataKey="throughput" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Scenario Comparison */}
+        <div className="bg-white/5 rounded-lg p-6 border border-white/10 backdrop-blur">
+          <h3 className="text-lg font-semibold text-white mb-4">Scenario Comparison</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={scenarioComparison}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="name" stroke="#9CA3AF" />
+              <YAxis stroke="#9CA3AF" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1F2937', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#F9FAFB'
+                }}
+              />
+              <Legend />
+              <Bar dataKey="efficiency" fill="#10B981" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="cost" fill="#EF4444" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Cost Analysis Over Time */}
+        <div className="bg-white/5 rounded-lg p-6 border border-white/10 backdrop-blur">
+          <h3 className="text-lg font-semibold text-white mb-4">Cost Analysis Over Time</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={costAnalysis}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="name" stroke="#9CA3AF" />
+              <YAxis stroke="#9CA3AF" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1F2937', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#F9FAFB'
+                }}
+                formatter={(value: any) => [`$${(value / 1000).toFixed(0)}K`, '']}
+              />
+              <Legend />
+              <Area 
+                type="monotone" 
+                dataKey="baseline" 
+                stroke="#EF4444" 
+                fill="#EF4444" 
+                fillOpacity={0.3}
+                strokeWidth={2}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="optimized" 
+                stroke="#10B981" 
+                fill="#10B981" 
+                fillOpacity={0.3}
+                strokeWidth={2}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Performance Metrics vs Targets */}
+        <div className="bg-white/5 rounded-lg p-6 border border-white/10 backdrop-blur">
+          <h3 className="text-lg font-semibold text-white mb-4">Performance vs Targets</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={performanceMetrics}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="name" stroke="#9CA3AF" />
+              <YAxis stroke="#9CA3AF" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1F2937', 
+                  border: '1px solid #374151',
+                  borderRadius: '8px',
+                  color: '#F9FAFB'
+                }}
+              />
+              <Legend />
+              <Bar dataKey="baseline" fill="#6B7280" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="optimized" fill="#10B981" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="target" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Optimization Results */}
+      <div className="bg-white/5 rounded-lg p-6 border border-white/10 backdrop-blur">
+        <h3 className="text-lg font-semibold text-white mb-4">Optimization Results & ROI</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <ComposedChart data={optimizationResults}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis dataKey="name" stroke="#9CA3AF" />
+            <YAxis stroke="#9CA3AF" />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#1F2937', 
+                border: '1px solid #374151',
+                borderRadius: '8px',
+                color: '#F9FAFB'
+              }}
+            />
+            <Legend />
+            <Bar dataKey="current" fill="#6B7280" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="optimized" fill="#10B981" radius={[4, 4, 0, 0]} />
+            <Line 
+              type="monotone" 
+              dataKey="roi" 
+              stroke="#F59E0B" 
+              strokeWidth={3}
+              dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6 }}
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-5 gap-4">
+          {optimizationResults.map((item) => (
+            <div key={item.name} className="text-center">
+              <div className="text-lg font-bold text-white mb-1">{item.savings}%</div>
+              <p className="text-xs text-white/70">{item.name}</p>
+              <p className="text-xs text-green-400">ROI: {item.roi}%</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* What-If Scenarios */}
+      <div className="bg-white/5 rounded-lg p-6 border border-white/10 backdrop-blur">
+        <h3 className="text-lg font-semibold text-white mb-4">What-If Scenario Analysis</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-lg p-6 border border-blue-500/30">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-blue-500/20 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <Truck className="h-8 w-8 text-blue-400" />
+              </div>
+              <h4 className="text-white font-medium mb-2">Route Optimization</h4>
+              <p className="text-blue-300 text-sm mb-3">Optimize delivery routes using AI algorithms</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-white/70">Cost Impact:</span>
+                  <span className="text-green-400">-$15K/month</span>
                 </div>
-              )}
-              
-              {latestResult.recommendations && (
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-white">Recommendations</h4>
-                  {latestResult.recommendations.map((rec: any, index: number) => (
-                    <div key={index} className="bg-white/5 rounded-lg p-3 border border-white/10">
-                      <p className="text-sm text-white">{rec.message}</p>
-                    </div>
-                  ))}
+                <div className="flex justify-between">
+                  <span className="text-white/70">Time Savings:</span>
+                  <span className="text-green-400">+2.5 hours</span>
                 </div>
-              )}
+                <div className="flex justify-between">
+                  <span className="text-white/70">ROI:</span>
+                  <span className="text-green-400">340%</span>
+                </div>
+              </div>
             </div>
           </div>
-        )}
 
-        {/* Simulation Controls */}
-        <div className="bg-white/5 rounded-lg p-6 border border-white/10 backdrop-blur">
-          <h3 className="text-lg font-semibold text-white mb-4">Simulation Controls</h3>
-          <div className="flex flex-wrap gap-3">
-            <button 
-              onClick={() => {
-                const queuedScenarios = scenarios.filter(s => s.status === 'queued');
-                queuedScenarios.forEach(s => runSimulation(s.id));
-              }}
-              disabled={loading}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 disabled:opacity-50"
-            >
-              <Play className="h-4 w-4" />
-              <span>Run All</span>
-            </button>
-            <button 
-              onClick={() => {
-                const runningScenarios = scenarios.filter(s => s.status === 'running');
-                runningScenarios.forEach(s => pauseSimulation(s.id));
-              }}
-              className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors flex items-center space-x-2"
-            >
-              <Pause className="h-4 w-4" />
-              <span>Pause All</span>
-            </button>
-            <button 
-              onClick={resetAllSimulations}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
-            >
-              <RotateCcw className="h-4 w-4" />
-              <span>Reset All</span>
-            </button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
-              <BarChart3 className="h-4 w-4" />
-              <span>Export Results</span>
-            </button>
+          <div className="bg-gradient-to-r from-green-500/20 to-green-600/20 rounded-lg p-6 border border-green-500/30">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-500/20 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <Package className="h-8 w-8 text-green-400" />
+              </div>
+              <h4 className="text-white font-medium mb-2">Inventory Optimization</h4>
+              <p className="text-green-300 text-sm mb-3">Implement just-in-time inventory management</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-white/70">Cost Impact:</span>
+                  <span className="text-green-400">-$8K/month</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Storage Savings:</span>
+                  <span className="text-green-400">+25%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">ROI:</span>
+                  <span className="text-green-400">280%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-purple-500/20 to-purple-600/20 rounded-lg p-6 border border-purple-500/30">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-purple-500/20 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <BarChart3 className="h-8 w-8 text-purple-400" />
+              </div>
+              <h4 className="text-white font-medium mb-2">Predictive Analytics</h4>
+              <p className="text-purple-300 text-sm mb-3">Use ML to predict demand and optimize supply</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-white/70">Cost Impact:</span>
+                  <span className="text-green-400">-$12K/month</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Accuracy:</span>
+                  <span className="text-green-400">+15%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">ROI:</span>
+                  <span className="text-green-400">180%</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* New Scenario Modal */}
-      {showNewScenarioModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-white">Create New Scenario</h3>
-              <button 
-                onClick={() => setShowNewScenarioModal(false)}
-                className="text-white/70 hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-white/70 mb-2">Scenario Name</label>
-                <input
-                  type="text"
-                  value={newScenario.name}
-                  onChange={(e) => setNewScenario({...newScenario, name: e.target.value})}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                  placeholder="Enter scenario name"
-                />
+      {/* Simulation Insights */}
+      <div className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-lg p-6 border border-indigo-500/30 backdrop-blur">
+        <h3 className="text-lg font-semibold text-white mb-4">Simulation Insights & Recommendations</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="text-white font-medium mb-3">Key Findings</h4>
+            <ul className="space-y-2 text-sm text-white/80">
+              <li className="flex items-start space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
+                <span>Route optimization can reduce transportation costs by 22%</span>
+              </li>
+              <li className="flex items-start space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
+                <span>Multi-modal transport increases throughput by 25%</span>
+              </li>
+              <li className="flex items-start space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
+                <span>AI-powered optimization improves efficiency by 17%</span>
+              </li>
+              <li className="flex items-start space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
+                <span>Predictive analytics reduces stockouts by 30%</span>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-white font-medium mb-3">Implementation Priority</h4>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+                <span className="text-white text-sm">Route Optimization</span>
+                <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">High Priority</span>
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-white/70 mb-2">Description</label>
-                <textarea
-                  value={newScenario.description}
-                  onChange={(e) => setNewScenario({...newScenario, description: e.target.value})}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                  rows={3}
-                  placeholder="Describe the scenario"
-                />
+              <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+                <span className="text-white text-sm">Inventory Management</span>
+                <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded">Medium Priority</span>
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-white/70 mb-2">Scenario Type</label>
-                <select
-                  value={newScenario.scenarioType}
-                  onChange={(e) => setNewScenario({...newScenario, scenarioType: e.target.value})}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                >
-                  <option value="">Select Scenario Type</option>
-                  <option value="port_closure">Port Closure</option>
-                  <option value="weather_event">Weather Event</option>
-                  <option value="geopolitical_crisis">Geopolitical Crisis</option>
-                  <option value="demand_surge">Demand Surge</option>
-                  <option value="custom">Custom Scenario</option>
-                </select>
+              <div className="flex items-center justify-between p-3 bg-white/10 rounded-lg">
+                <span className="text-white text-sm">Predictive Analytics</span>
+                <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded">Low Priority</span>
               </div>
-            </div>
-            
-            <div className="flex justify-end space-x-3 mt-6">
-              <button
-                onClick={() => setShowNewScenarioModal(false)}
-                className="px-4 py-2 text-white/70 hover:text-white transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={addNewScenario}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Create Scenario
-              </button>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

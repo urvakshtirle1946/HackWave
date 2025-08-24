@@ -40,7 +40,7 @@ const Navigation = () => {
         
         <div className="hidden items-center gap-3 md:flex">
           <Link to="/signup" className="rounded-full px-4 py-2 text-sm text-white/80 hover:text-white transition-colors">Sign in</Link>
-          <Link to="/login" className="rounded-full bg-white px-4 py-2 text-sm font-medium text-black shadow-sm transition hover:bg-white/90">Launch App</Link>
+          <Link to="/app/vulnerability-assessment" className="rounded-full bg-white px-4 py-2 text-sm font-medium text-black shadow-sm transition hover:bg-white/90">Launch App</Link>
         </div>
         
         {/* Mobile Menu Button */}
@@ -171,7 +171,7 @@ const Hero = () => {
             </p>
             
             <div style={{ animationDelay: '400ms' }} className={`mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row ${isMounted ? 'animate-fadeInUp' : 'opacity-0'}`}>
-              <Link to="/login" className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-black shadow transition hover:bg-white/90 group">
+              <Link to="/app/vulnerability-assessment" className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-black shadow transition hover:bg-white/90 group">
                 <Play className="w-4 h-4 mr-2 group-hover:animate-pulse" />
                 Run a Live Simulation
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -434,7 +434,7 @@ const SneakPeek = () => (
           </div>
         </div>
         
-        <Link to="/login" className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-lg font-semibold text-black shadow transition hover:bg-white/90 group">
+        <Link to="/app/vulnerability-assessment" className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-lg font-semibold text-black shadow transition hover:bg-white/90 group">
           Explore Dashboard
           <ArrowUpRight className="w-5 h-5 ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
         </Link>
@@ -525,7 +525,7 @@ const FinalCTA = () => (
       <p className="text-xl mb-8 text-blue-100">
         Join the revolution in supply chain resilience. Experience the power of AI-driven risk management.
       </p>
-      <Link to="/login" className="inline-flex items-center justify-center rounded-full bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl group">
+              <Link to="/app/vulnerability-assessment" className="inline-flex items-center justify-center rounded-full bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl group">
         Explore Full Dashboard
         <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
       </Link>
