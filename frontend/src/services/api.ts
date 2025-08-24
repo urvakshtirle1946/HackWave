@@ -1,5 +1,5 @@
 // API Base URL - Update this to match your backend URL
-const API_BASE_URL = 'http://localhost:3001/api'; // Adjust port as needed
+const API_BASE_URL = 'http://localhost:3000/api'; // Adjust port as needed
 
 // Generic API functions
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
@@ -172,3 +172,52 @@ export const healthCheck = () => apiRequest('/health');
 
 // Get all endpoints info
 export const getEndpoints = () => apiRequest('/endpoints');
+
+// Simulation API (AI Agent)
+const AI_AGENT_BASE_URL = 'http://localhost:3001/api'; // AI Agent runs on port 3001
+
+const aiAgentRequest = async (endpoint: string, options: RequestInit = {}) => {
+  const url = `${AI_AGENT_BASE_URL}${endpoint}`;
+  const config: RequestInit = {
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+    ...options,
+  };
+
+  try {
+    const response = await fetch(url, config);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('AI Agent API request failed:', error);
+    throw error;
+  }
+};
+
+export const simulationAPI = {
+  runScenario: (scenarioType: string, scenarioParams?: any) => 
+    aiAgentRequest('/simulation', { 
+      method: 'POST', 
+      body: JSON.stringify({ scenarioType, scenarioParams }) 
+    }),
+  runRiskAssessment: (data: any) => 
+    aiAgentRequest('/risk-assessment', { 
+      method: 'POST', 
+      body: JSON.stringify(data) 
+    }),
+  runStrategicPlanning: (data: any) => 
+    aiAgentRequest('/strategic-planning', { 
+      method: 'POST', 
+      body: JSON.stringify(data) 
+    }),
+  getMonitoring: () => aiAgentRequest('/monitoring'),
+  runCustomWorkflow: (steps: any[]) => 
+    aiAgentRequest('/custom-workflow', { 
+      method: 'POST', 
+      body: JSON.stringify({ steps }) 
+    }),
+};
