@@ -54,7 +54,7 @@ export default function Layout() {
           <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
           <div className="fixed left-0 top-0 h-full w-64 bg-black/95 backdrop-blur-md shadow-xl border-r border-white/10">
             <div className="flex h-16 items-center justify-between px-4">
-              <h1 className="text-xl font-bold text-blue-400">Supply Chain AI</h1>
+              <h1 className="text-xl font-bold text-blue-400">Veylox</h1>
               <button
                 onClick={() => setSidebarOpen(false)}
                 className="text-gray-400 hover:text-white"
@@ -90,7 +90,7 @@ export default function Layout() {
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex min-h-0 flex-1 flex-col bg-black/95 backdrop-blur-md border-r border-white/10">
           <div className="flex h-16 items-center px-4">
-            <h1 className="text-xl font-bold text-blue-400">Supply Chain AI</h1>
+            <h1 className="text-xl font-bold text-blue-400 mt-3">Veylox</h1>
           </div>
           <nav className="mt-8 flex-1 space-y-2 px-4">
             {navigation.map((item) => {

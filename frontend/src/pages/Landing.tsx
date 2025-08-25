@@ -8,7 +8,6 @@ import {
   Database, 
   Zap, 
   CheckCircle, 
-  Users, 
   BarChart3,
   AlertTriangle,
   Lightbulb,
@@ -28,7 +27,7 @@ const Navigation = () => {
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6 md:px-8">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg"></div>
-          <span className="text-xl font-bold text-white">SupplyChain AI</span>
+          <span className="text-xl font-bold text-white">Veylox</span>
         </div>
         
         {/* Desktop Navigation */}
@@ -40,7 +39,7 @@ const Navigation = () => {
         
         <div className="hidden items-center gap-3 md:flex">
           <Link to="/signup" className="rounded-full px-4 py-2 text-sm text-white/80 hover:text-white transition-colors">Sign in</Link>
-          <Link to="/app/vulnerability-assessment" className="rounded-full bg-white px-4 py-2 text-sm font-medium text-black shadow-sm transition hover:bg-white/90">Launch App</Link>
+          <Link to="/app" className="rounded-full bg-white px-4 py-2 text-sm font-medium text-black shadow-sm transition hover:bg-white/90">Launch App</Link>
         </div>
         
         {/* Mobile Menu Button */}
@@ -157,17 +156,17 @@ const Hero = () => {
           <div className={`mx-auto text-center ${isMounted ? 'animate-fadeInUp' : 'opacity-0'}`}>
             <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-[11px] uppercase tracking-wider text-white/70 ring-1 ring-white/10 backdrop-blur">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
-              AI-Powered Risk Management
+              Advanced Logistics Platform
             </span>
             
             <h1 style={{ animationDelay: '200ms' }} className={`mt-6 text-4xl font-bold tracking-tight md:text-6xl ${isMounted ? 'animate-fadeInUp' : 'opacity-0'}`}>
-              <span className="text-blue-400">AI-Powered</span> Supply Chain
+              <span className="text-blue-400">Veylox</span> Logistics
               <br />
-              <span className="text-blue-300">Resilience</span>
+              <span className="text-blue-300">Management</span>
             </h1>
             
             <p style={{ animationDelay: '300ms' }} className={`mx-auto mt-5 max-w-2xl text-balance text-white/80 md:text-lg ${isMounted ? 'animate-fadeInUp' : 'opacity-0'}`}>
-              Analyze. Predict. Mitigate Risks Before They Happen.
+              Streamline. Optimize. Deliver with Precision and Intelligence.
             </p>
             
             <div style={{ animationDelay: '400ms' }} className={`mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row ${isMounted ? 'animate-fadeInUp' : 'opacity-0'}`}>
@@ -228,7 +227,7 @@ const Problem = () => (
     <div className="max-w-6xl mx-auto px-6">
       <div className="text-center mb-16">
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-          Why Supply Chain Risk is a Critical Challenge
+          Why Modern Logistics Needs Intelligence
         </h2>
       </div>
       
@@ -267,10 +266,10 @@ const Solution = () => (
     <div className="max-w-6xl mx-auto px-6">
       <div className="text-center mb-16">
         <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-          Meet Our AI Agent System
+          Meet Veylox Platform
         </h2>
         <p className="text-xl text-white/70 max-w-3xl mx-auto">
-          Think of it as your 24/7 risk analyst, optimizer, and decision advisor.
+          Your comprehensive logistics management solution with AI-powered insights.
         </p>
       </div>
       
@@ -458,10 +457,10 @@ const Team = () => (
       
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
         {[
-          { name: "Alex Chen", role: "Lead AI Engineer", avatar: "👨‍💻" },
-          { name: "Sarah Kim", role: "Data Scientist", avatar: "👩‍🔬" },
-          { name: "Marcus Rodriguez", role: "Supply Chain Expert", avatar: "👨‍💼" },
-          { name: "Priya Patel", role: "Full-Stack Developer", avatar: "👩‍💻" }
+          { name: "Harsh Singh", role: "Lead Developer", avatar: "👨‍💻" },
+          { name: "Gyanendra Singh", role: "Backend Developer", avatar: "👩‍🔬" },
+          { name: "Urvaksh Tirle", role: "Research & Designer", avatar: "👨‍💼" },
+          { name: "Kartik Kumar", role: "Frontend Developer", avatar: "👩‍💻" }
         ].map((member, index) => (
           <div key={index} className="text-center group">
             <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
@@ -519,12 +518,12 @@ const ScrollToTop = () => {
 const FinalCTA = () => (
   <section className="py-20 bg-gradient-to-br from-blue-600 to-blue-700 text-white">
     <div className="max-w-4xl mx-auto px-6 text-center">
-      <h2 className="text-4xl md:text-5xl font-bold mb-6">
-        Supply chains are fragile. Let's make them future-proof with AI.
-      </h2>
-      <p className="text-xl mb-8 text-blue-100">
-        Join the revolution in supply chain resilience. Experience the power of AI-driven risk management.
-      </p>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          Ready to transform your logistics operations?
+        </h2>
+        <p className="text-xl mb-8 text-blue-100">
+          Join the future of intelligent logistics management with Veylox.
+        </p>
               <Link to="/app/vulnerability-assessment" className="inline-flex items-center justify-center rounded-full bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl group">
         Explore Full Dashboard
         <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />

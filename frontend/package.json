@@ -1,7 +1,8 @@
 {
-  "name": "frontend",
+  "name": "veylox-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Veylox - Advanced Logistics and Supply Chain Management Platform",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -39,5 +40,8 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2"
-  }
+  },
+  "keywords": ["logistics", "supply-chain", "veylox", "tracking", "management"],
+  "author": "Veylox Team",
+  "license": "MIT"
 }
