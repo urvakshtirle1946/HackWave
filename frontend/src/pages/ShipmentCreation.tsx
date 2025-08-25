@@ -89,12 +89,11 @@ export default function ShipmentCreation() {
     }
   };
 
-
-
   const addRoute = () => {
+    const previousRoute = shipment.routes[shipment.routes.length - 1];
     const newRoute: RouteSegment = {
-      fromLocationType: 'supplier',
-      fromLocation: '',
+      fromLocationType: previousRoute ? previousRoute.toLocationType : 'supplier',
+      fromLocation: previousRoute ? previousRoute.toLocation : '',
       toLocationType: 'port',
       toLocation: '',
       sequenceNumber: shipment.routes.length + 1,
@@ -116,11 +115,28 @@ export default function ShipmentCreation() {
 
   const deleteRoute = (index: number) => {
     const updatedRoutes = shipment.routes.filter((_, i) => i !== index);
-    // Reorder sequence numbers
-    const reorderedRoutes = updatedRoutes.map((route, i) => ({
-      ...route,
-      sequenceNumber: i + 1
-    }));
+    // Reorder sequence numbers and update from locations
+    const reorderedRoutes: RouteSegment[] = [];
+    
+    updatedRoutes.forEach((route, i) => {
+      if (i === 0) {
+        // First route - keep original from location
+        reorderedRoutes.push({
+          ...route,
+          sequenceNumber: i + 1
+        });
+      } else {
+        // Update from location to match previous route's to location
+        const previousRoute = reorderedRoutes[i - 1];
+        reorderedRoutes.push({
+          ...route,
+          sequenceNumber: i + 1,
+          fromLocationType: previousRoute.toLocationType,
+          fromLocation: previousRoute.toLocation
+        });
+      }
+    });
+    
     setShipment({ ...shipment, routes: reorderedRoutes });
   };
 
@@ -428,8 +444,6 @@ export default function ShipmentCreation() {
                     <option value="completed">Completed</option>
                   </select>
                 </div>
-
-
               </div>
             </div>
 
@@ -458,65 +472,72 @@ export default function ShipmentCreation() {
               ) : (
                 <div className="space-y-4">
                   {shipment.routes.map((route, index) => (
-                    <div key={index} className="bg-white/5 rounded-lg p-4 border border-white/10">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium">
-                            {route.sequenceNumber}
-                          </span>
-                          <div className="flex items-center space-x-2">
-                            {getModeIcon(route.mode)}
-                            <span className={`font-medium ${getModeColor(route.mode)}`}>
-                              {route.mode.toUpperCase()}
+                    <div key={index}>
+                      {index > 0 && (
+                        <div className="flex justify-center mb-2">
+                          <div className="w-px h-6 bg-blue-400/30"></div>
+                        </div>
+                      )}
+                      <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center space-x-3">
+                            <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium">
+                              {route.sequenceNumber}
                             </span>
+                            <div className="flex items-center space-x-2">
+                              {getModeIcon(route.mode)}
+                              <span className={`font-medium ${getModeColor(route.mode)}`}>
+                                {route.mode.toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => editRoute(index)}
+                              className="p-1 text-blue-400 hover:text-blue-300 transition-colors"
+                            >
+                              <Navigation className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => deleteRoute(index)}
+                              className="p-1 text-red-400 hover:text-red-300 transition-colors"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => editRoute(index)}
-                            className="p-1 text-blue-400 hover:text-blue-300 transition-colors"
-                          >
-                            <Navigation className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => deleteRoute(index)}
-                            className="p-1 text-red-400 hover:text-red-300 transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div className="flex items-center space-x-2">
-                          <MapPin className="h-4 w-4 text-blue-400" />
-                          <span className="text-white">{route.fromLocation}</span>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                          <div className="flex items-center space-x-2">
+                            <MapPin className="h-4 w-4 text-blue-400" />
+                            <span className="text-white">{route.fromLocation}</span>
+                          </div>
+                          <ArrowRight className="h-4 w-4 text-gray-400 mx-auto" />
+                          <div className="flex items-center space-x-2">
+                            <MapPin className="h-4 w-4 text-green-400" />
+                            <span className="text-white">{route.toLocation}</span>
+                          </div>
                         </div>
-                        <ArrowRight className="h-4 w-4 text-gray-400 mx-auto" />
-                        <div className="flex items-center space-x-2">
-                          <MapPin className="h-4 w-4 text-green-400" />
-                          <span className="text-white">{route.toLocation}</span>
-                        </div>
-                      </div>
 
-                      <div className="grid grid-cols-4 gap-4 mt-3 text-sm">
-                        <div className="flex items-center space-x-2">
-                          <Users className="h-4 w-4 text-gray-400" />
-                          <span className="text-white">{route.carrierName}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Clock className="h-4 w-4 text-gray-400" />
-                          <span className="text-white">{route.travelTimeEst}h</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <DollarSign className="h-4 w-4 text-gray-400" />
-                          <span className="text-white">${route.costEst.toLocaleString()}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-gray-400">Risk:</span>
-                          <span className={`font-medium ${getRiskColor(calculateRouteRisk(route))}`}>
-                            {calculateRouteRisk(route)}%
-                          </span>
+                        <div className="grid grid-cols-4 gap-4 mt-3 text-sm">
+                          <div className="flex items-center space-x-2">
+                            <Users className="h-4 w-4 text-gray-400" />
+                            <span className="text-white">{route.carrierName}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Clock className="h-4 w-4 text-gray-400" />
+                            <span className="text-white">{route.travelTimeEst}h</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <DollarSign className="h-4 w-4 text-gray-400" />
+                            <span className="text-white">${route.costEst.toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-gray-400">Risk:</span>
+                            <span className={`font-medium ${getRiskColor(calculateRouteRisk(route))}`}>
+                              {calculateRouteRisk(route)}%
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -590,7 +611,8 @@ export default function ShipmentCreation() {
                 <select
                   value={editingRoute.fromLocationType}
                   onChange={(e) => setEditingRoute({ ...editingRoute, fromLocationType: e.target.value, fromLocation: '' })}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={routeIndex === -1 && shipment.routes.length > 0}
+                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="supplier">Supplier</option>
                   <option value="port">Port</option>
@@ -604,9 +626,13 @@ export default function ShipmentCreation() {
                   type="text"
                   value={editingRoute.fromLocation}
                   onChange={(e) => setEditingRoute({ ...editingRoute, fromLocation: e.target.value })}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter location name"
+                  disabled={routeIndex === -1 && shipment.routes.length > 0}
+                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  placeholder={routeIndex === -1 && shipment.routes.length > 0 ? "Auto-filled from previous route" : "Enter location name"}
                 />
+                {routeIndex === -1 && shipment.routes.length > 0 && (
+                  <p className="text-xs text-blue-400 mt-1">Auto-filled from previous route's destination</p>
+                )}
               </div>
             </div>
 

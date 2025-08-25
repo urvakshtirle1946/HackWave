@@ -5,9 +5,7 @@ import {
   ShieldAlert,
   Menu,
   X,
-  Truck,
   Cpu,
-  Server,
   Bell,
   Users,
   Building2,
@@ -15,12 +13,8 @@ import {
   Warehouse,
   Package,
   Route,
-  Plane,
-  Train,
   AlertTriangle,
   BarChart3,
-  Settings,
-  UserPlus,
   Navigation
 } from 'lucide-react';
 
@@ -28,7 +22,7 @@ const navigation = [
   { name: 'Dashboard', href: '/app', icon: LayoutDashboard },
   { name: 'Shipment Creation', href: '/app/shipment-creation', icon: Package },
   { name: 'Shipment Tracking', href: '/app/shipment-tracking', icon: Navigation },
-  { name: 'Route Definition', href: '/app/route-definition', icon: Route },
+  // { name: 'Route Definition', href: '/app/route-definition', icon: Route },
   { name: 'Shipment History', href: '/app/shipment-history', icon: BarChart3 },
   { name: 'Shipments', href: '/app/shipments', icon: Package },
   { name: 'Routes', href: '/app/routes', icon: Route },
