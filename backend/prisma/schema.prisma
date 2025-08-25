@@ -122,6 +122,7 @@ model Disruption {
   locationId   String
   severity     String
   description  String
+  status      String     @default("monitoring") // active, resolved, monitoring
   startTime    DateTime
   endTime      DateTime?
   affectedShipments ShipmentDisruption[]
