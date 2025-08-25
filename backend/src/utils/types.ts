@@ -28,7 +28,7 @@ export interface ShippingData {
 export interface ProcessedEvent {
   type: 'strike' | 'weather' | 'congestion' | 'geopolitical' | 'technical' | 'other';
   locationType: 'port' | 'warehouse' | 'route' | 'supplier' | 'customer';
-  locationId: string;
+  location: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   description: string;
   startTime: string;

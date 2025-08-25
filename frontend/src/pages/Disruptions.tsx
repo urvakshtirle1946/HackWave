@@ -7,9 +7,10 @@ interface Disruption {
   id: string;
   type: string;
   locationType: string;
-  locationId: string;
+  location: string;
   severity: string;
   description: string;
+  status: string;
   startTime: string;
   endTime?: string;
 }
@@ -22,9 +23,10 @@ export default function Disruptions() {
   const [formData, setFormData] = useState({
     type: '',
     locationType: '',
-    locationId: '',
+    location: '',
     severity: '',
     description: '',
+    status: 'monitoring',
     startTime: '',
     endTime: '',
   });
@@ -32,7 +34,7 @@ export default function Disruptions() {
   const columns = [
     { key: 'type', label: 'Type', sortable: true },
     { key: 'locationType', label: 'Location Type', sortable: true },
-    { key: 'locationId', label: 'Location ID', sortable: true },
+    { key: 'location', label: 'Location', sortable: true },
     { 
       key: 'severity', 
       label: 'Severity', 
@@ -42,6 +44,20 @@ export default function Disruptions() {
           value === 'high' ? 'bg-red-500/20 text-red-400' :
           value === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
           'bg-green-500/20 text-green-400'
+        }`}>
+          {value.toUpperCase()}
+        </span>
+      )
+    },
+    { 
+      key: 'status', 
+      label: 'Status', 
+      sortable: true,
+      render: (value: string) => (
+        <span className={`px-2 py-1 rounded text-xs ${
+          value === 'active' ? 'bg-red-500/20 text-red-400' :
+          value === 'resolved' ? 'bg-green-500/20 text-green-400' :
+          'bg-yellow-500/20 text-yellow-400'
         }`}>
           {value.toUpperCase()}
         </span>
@@ -92,9 +108,10 @@ export default function Disruptions() {
     setFormData({
       type: '',
       locationType: '',
-      locationId: '',
+      location: '',
       severity: '',
       description: '',
+      status: 'monitoring',
       startTime: '',
       endTime: '',
     });
@@ -106,9 +123,10 @@ export default function Disruptions() {
     setFormData({
       type: disruption.type,
       locationType: disruption.locationType,
-      locationId: disruption.locationId,
+      location: disruption.location,
       severity: disruption.severity,
       description: disruption.description,
+      status: disruption.status || 'monitoring',
       startTime: disruption.startTime.split('T')[0],
       endTime: disruption.endTime ? disruption.endTime.split('T')[0] : '',
     });
@@ -178,7 +196,7 @@ export default function Disruptions() {
         size="lg"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-white mb-2">
                 Type
@@ -216,6 +234,23 @@ export default function Disruptions() {
                 <option value="high">High</option>
               </select>
             </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Status
+              </label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                required
+                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="monitoring">Monitoring</option>
+                <option value="active">Active</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -241,16 +276,16 @@ export default function Disruptions() {
 
             <div>
               <label className="block text-sm font-medium text-white mb-2">
-                Location ID
+                Location
               </label>
               <input
                 type="text"
-                name="locationId"
-                value={formData.locationId}
+                name="location"
+                value={formData.location}
                 onChange={handleInputChange}
                 required
                 className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Location ID"
+                placeholder="Location"
               />
             </div>
           </div>

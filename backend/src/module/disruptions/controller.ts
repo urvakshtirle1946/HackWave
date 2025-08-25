@@ -65,7 +65,7 @@ export class DisruptionController {
       const {
         type,
         locationType,
-        locationId,
+        location,
         severity,
         description,
         startTime,
@@ -76,7 +76,7 @@ export class DisruptionController {
         data: {
           type,
           locationType,
-          locationId,
+          location,
           severity,
           description,
           startTime: new Date(startTime),
@@ -97,7 +97,7 @@ export class DisruptionController {
       const {
         type,
         locationType,
-        locationId,
+        location,
         severity,
         description,
         startTime,
@@ -112,7 +112,7 @@ export class DisruptionController {
       const updateData: any = {
         type,
         locationType,
-        locationId,
+        location,
         severity,
         description,
         endTime: endTime ? new Date(endTime) : null,
@@ -227,17 +227,17 @@ export class DisruptionController {
   // Get disruptions by location
   static async getDisruptionsByLocation(req: Request, res: Response) {
     try {
-      const { locationType, locationId } = req.params;
+      const { locationType, location } = req.params;
 
-      if (!locationType || !locationId) {
+      if (!locationType || !location) {
         return res
           .status(400)
-          .json({ error: "Location type and ID are required" });
+          .json({ error: "Location type and location are required" });
       }
       const disruptions = await prisma.disruption.findMany({
         where: {
           locationType,
-          locationId,
+          location,
         },
         include: {
           affectedShipments: {

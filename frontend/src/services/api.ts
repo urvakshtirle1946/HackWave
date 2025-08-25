@@ -75,6 +75,7 @@ export const shipmentsAPI = {
   getBySupplier: (supplierId: string) => apiRequest(`/shipments/supplier/${supplierId}`),
   getByCustomer: (customerId: string) => apiRequest(`/shipments/customer/${customerId}`),
   getRoutes: (id: string) => apiRequest(`/shipments/${id}/routes`),
+  calculateRisk: (shipmentId: string) => apiRequest(`/shipments/${shipmentId}/risk`),
 };
 
 // Routes API
@@ -135,8 +136,8 @@ export const disruptionsAPI = {
   delete: (id: string) => apiRequest(`/disruptions/${id}`, { method: 'DELETE' }),
   getByType: (type: string) => apiRequest(`/disruptions/type/${type}`),
   getBySeverity: (severity: string) => apiRequest(`/disruptions/severity/${severity}`),
-  getByLocation: (locationType: string, locationId: string) => 
-    apiRequest(`/disruptions/location/${locationType}/${locationId}`),
+    getByLocation: (locationType: string, location: string) =>
+    apiRequest(`/disruptions/location/${locationType}/${location}`),
 };
 
 // Inventory API

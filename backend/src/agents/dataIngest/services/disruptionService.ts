@@ -7,7 +7,7 @@ export class DisruptionService {
     try {
       logger.info('Storing disruption event', { 
         type: event.type, 
-        locationId: event.locationId,
+        location: event.location,
         severity: event.severity 
       });
 
@@ -15,7 +15,7 @@ export class DisruptionService {
         data: {
           type: event.type,
           locationType: event.locationType,
-          locationId: event.locationId,
+          location: event.location,
           severity: event.severity,
           description: event.description,
           startTime: new Date(event.startTime),

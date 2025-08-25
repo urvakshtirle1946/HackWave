@@ -133,7 +133,7 @@ export class DataIngestAgent {
 
       logger.info('Event stored successfully', { 
         type: event.type, 
-        locationId: event.locationId,
+        location: event.location,
         disruptionId 
       });
     } catch (error) {

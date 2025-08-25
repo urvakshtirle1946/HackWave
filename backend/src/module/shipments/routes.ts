@@ -12,5 +12,6 @@ router.get("/status/:status", ShipmentController.getShipmentsByStatus);
 router.get("/supplier/:supplierId", ShipmentController.getShipmentsBySupplier);
 router.get("/customer/:customerId", ShipmentController.getShipmentsByCustomer);
 router.get("/:id/routes", ShipmentController.getShipmentRoutes);
+router.get("/:shipmentId/risk", ShipmentController.calculateShipmentRisk);
 
 export default router;

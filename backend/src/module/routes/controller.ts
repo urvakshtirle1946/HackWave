@@ -57,9 +57,9 @@ export class RouteController {
       const {
         shipmentId,
         fromLocationType,
-        fromLocationId,
+        fromLocation,
         toLocationType,
-        toLocationId,
+        toLocation,
         sequenceNumber,
         mode,
         carrierName,
@@ -71,9 +71,9 @@ export class RouteController {
         data: {
           shipmentId,
           fromLocationType,
-          fromLocationId,
+          fromLocation,
           toLocationType,
-          toLocationId,
+          toLocation,
           sequenceNumber,
           mode,
           carrierName,
@@ -97,9 +97,9 @@ export class RouteController {
       const { id } = req.params;
       const {
         fromLocationType,
-        fromLocationId,
+        fromLocation,
         toLocationType,
-        toLocationId,
+        toLocation,
         sequenceNumber,
         mode,
         carrierName,
@@ -115,9 +115,9 @@ export class RouteController {
         where: { id },
         data: {
           fromLocationType,
-          fromLocationId,
+          fromLocation,
           toLocationType,
-          toLocationId,
+          toLocation,
           sequenceNumber,
           mode,
           carrierName,

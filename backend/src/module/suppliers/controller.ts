@@ -4,6 +4,7 @@ import prisma from "../../config/prisma";
 export class SupplierController {
   // Get all suppliers
   static async getAllSuppliers(req: Request, res: Response) {
+    console.log("getAllSuppliers called:"); 
     try {
       const suppliers = await prisma.supplier.findMany({
         include: {
@@ -12,6 +13,7 @@ export class SupplierController {
       });
       res.json(suppliers);
     } catch (error) {
+      console.error("Error in getAllSuppliers:", error);
       res.status(500).json({ error: "Failed to fetch suppliers" });
     }
   }

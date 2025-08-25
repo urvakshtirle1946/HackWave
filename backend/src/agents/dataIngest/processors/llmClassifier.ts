@@ -36,7 +36,7 @@ Extract the following information as JSON:
 {
   "type": "strike|weather|congestion|geopolitical|technical|other",
   "locationType": "port|warehouse|route|supplier|customer",
-  "locationId": "specific location name",
+  "location": "specific location name",
   "severity": "low|medium|high|critical",
   "description": "brief description of the disruption",
   "startTime": "ISO timestamp",
@@ -93,7 +93,7 @@ Extract the following information as JSON:
 {
   "type": "weather",
   "locationType": "port",
-  "locationId": "${weatherData.location}",
+  "location": "${weatherData.location}",
   "severity": "low|medium|high|critical",
   "description": "weather disruption description",
   "startTime": "current ISO timestamp",
@@ -142,7 +142,7 @@ Extract the following information as JSON:
 {
   "type": "congestion|technical|other",
   "locationType": "port",
-  "locationId": "${shippingData.location}",
+  "location": "${shippingData.location}",
   "severity": "low|medium|high|critical",
   "description": "shipping disruption description",
   "startTime": "current ISO timestamp",
@@ -167,7 +167,7 @@ Only return valid JSON, no additional text.
 
   private validateAndNormalizeEvent(event: any, rawData: any): ProcessedEvent {
     // Validate required fields
-    const requiredFields = ['type', 'locationType', 'locationId', 'severity', 'description', 'startTime'];
+    const requiredFields = ['type', 'locationType', 'location', 'severity', 'description', 'startTime'];
     for (const field of requiredFields) {
       if (!event[field]) {
         throw new Error(`Missing required field: ${field}`);
@@ -178,7 +178,7 @@ Only return valid JSON, no additional text.
     return {
       type: event.type as ProcessedEvent['type'],
       locationType: event.locationType as ProcessedEvent['locationType'],
-      locationId: event.locationId,
+      location: event.location,
       severity: event.severity as ProcessedEvent['severity'],
       description: event.description,
       startTime: event.startTime,
@@ -207,7 +207,7 @@ Only return valid JSON, no additional text.
     return {
       type: randomType,
       locationType: randomLocationType,
-      locationId: 'Simulated Location',
+      location: 'Simulated Location',
       severity: randomSeverity,
       description: `Simulated disruption based on: ${article.title}`,
       startTime: new Date().toISOString(),
@@ -230,7 +230,7 @@ Only return valid JSON, no additional text.
     return {
       type: 'weather',
       locationType: 'port',
-      locationId: weatherData.location,
+      location: weatherData.location,
       severity,
       description: `${weatherData.conditions} conditions at ${weatherData.location} with ${weatherData.windSpeed} m/s winds`,
       startTime: new Date().toISOString(),
@@ -254,7 +254,7 @@ Only return valid JSON, no additional text.
     return {
       type: randomType,
       locationType: 'port',
-      locationId: shippingData.location,
+      location: shippingData.location,
       severity,
       description: `Vessel ${shippingData.vesselId} delayed by ${shippingData.delay} hours at ${shippingData.location}`,
       startTime: new Date().toISOString(),

@@ -15,7 +15,7 @@ router.get(
   DisruptionController.getDisruptionsBySeverity
 );
 router.get(
-  "/location/:locationType/:locationId",
+  "/location/:locationType/:location",
   DisruptionController.getDisruptionsByLocation
 );
 

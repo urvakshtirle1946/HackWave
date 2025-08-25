@@ -36,7 +36,7 @@ const navigation = [
   { name: 'Vulnerability Assessment', href: '/app/vulnerability-assessment', icon: ShieldAlert },
   { name: 'AI Test', href: '/app/ai-test', icon: Cpu },
   { name: 'Suppliers', href: '/app/suppliers', icon: Building2 },
-  // { name: 'Customers', href: '/app/customers', icon: Users },
+  { name: 'Customers', href: '/app/customers', icon: Users },
   { name: 'Port Hubs', href: '/app/port-hubs', icon: Ship },
   { name: 'Warehouses', href: '/app/warehouses', icon: Warehouse },
   // { name: 'Road Fleet', href: '/app/road-fleet', icon: Truck },

@@ -174,7 +174,7 @@ router.get("/endpoints", (req, res) => {
           "DELETE /:id",
           "GET /type/:type",
           "GET /severity/:severity",
-          "GET /location/:locationType/:locationId",
+          "GET /location/:locationType/:location",
         ],
       },
       inventory: {
