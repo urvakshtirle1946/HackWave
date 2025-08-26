@@ -7,6 +7,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
+    "agents": "ts-node src/runAgents.ts",
     "seed": "ts-node src/seeders/dataSeeder.ts",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
