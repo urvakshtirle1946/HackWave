@@ -1,3 +1,8 @@
+/* Ensure all <option> elements are visible in dropdowns */
+option {
+  color: #222 !important;
+  background: #fff !important;
+}
 #root {
   max-width: 1280px;
   margin: 0 auto;

@@ -1,5 +1,5 @@
 // API Base URL - Update this to match your backend URL
-const API_BASE_URL = 'http://localhost:3000/api'; // Adjust port as needed
+const API_BASE_URL = 'http://localhost:3001/api'; // Adjust port as needed
 
 // Generic API functions
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {

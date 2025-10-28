@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   Plus, Trash2, Save, ArrowRight, Truck, Ship, Plane, Train,
   Clock, DollarSign, MapPin, Navigation, Package, Users
 } from 'lucide-react';
-import { 
-  shipmentsAPI, suppliersAPI, customersAPI, routesAPI 
+import {
+  shipmentsAPI, suppliersAPI, customersAPI, routesAPI
 } from '../services/api';
 import Modal from '../components/Modal';
 
@@ -81,7 +81,7 @@ export default function ShipmentCreation() {
         suppliersAPI.getAll(),
         customersAPI.getAll(),
       ]);
-      
+
       setSuppliers(suppliersData);
       setCustomers(customersData);
     } catch (error) {
@@ -117,7 +117,7 @@ export default function ShipmentCreation() {
     const updatedRoutes = shipment.routes.filter((_, i) => i !== index);
     // Reorder sequence numbers and update from locations
     const reorderedRoutes: RouteSegment[] = [];
-    
+
     updatedRoutes.forEach((route, i) => {
       if (i === 0) {
         // First route - keep original from location
@@ -136,7 +136,7 @@ export default function ShipmentCreation() {
         });
       }
     });
-    
+
     setShipment({ ...shipment, routes: reorderedRoutes });
   };
 
@@ -144,7 +144,7 @@ export default function ShipmentCreation() {
     if (!editingRoute) return;
 
     const updatedRoutes = [...shipment.routes];
-    
+
     if (routeIndex >= 0) {
       // Editing existing route
       updatedRoutes[routeIndex] = editingRoute;
@@ -184,7 +184,7 @@ export default function ShipmentCreation() {
 
   const calculateRouteRisk = (route: RouteSegment) => {
     let routeRisk = 0;
-    
+
     // Base risk by transport mode
     switch (route.mode) {
       case 'sea':
@@ -202,16 +202,16 @@ export default function ShipmentCreation() {
       default:
         routeRisk += 15;
     }
-    
+
     // Risk based on travel time
     if (route.travelTimeEst > 72) routeRisk += 20;
     else if (route.travelTimeEst > 48) routeRisk += 15;
     else if (route.travelTimeEst > 24) routeRisk += 10;
-    
+
     // Risk based on cost
     if (route.costEst > 10000) routeRisk -= 10;
     else if (route.costEst < 1000) routeRisk += 10;
-    
+
     // Risk based on location types
     if (route.fromLocationType === 'port' || route.toLocationType === 'port') {
       routeRisk += 5;
@@ -219,7 +219,7 @@ export default function ShipmentCreation() {
     if (route.fromLocationType === 'warehouse' || route.toLocationType === 'warehouse') {
       routeRisk -= 5;
     }
-    
+
     return Math.max(0, Math.min(100, routeRisk));
   };
 
@@ -239,13 +239,13 @@ export default function ShipmentCreation() {
 
   const calculateRiskScore = () => {
     if (shipment.routes.length === 0) return 0;
-    
+
     let totalRisk = 0;
     let routeCount = 0;
-    
+
     shipment.routes.forEach(route => {
       let routeRisk = 0;
-      
+
       // Base risk by transport mode
       switch (route.mode) {
         case 'sea':
@@ -263,16 +263,16 @@ export default function ShipmentCreation() {
         default:
           routeRisk += 15;
       }
-      
+
       // Risk based on travel time (longer routes = higher risk)
       if (route.travelTimeEst > 72) routeRisk += 20; // > 3 days
       else if (route.travelTimeEst > 48) routeRisk += 15; // > 2 days
       else if (route.travelTimeEst > 24) routeRisk += 10; // > 1 day
-      
+
       // Risk based on cost (higher cost might indicate premium service = lower risk)
       if (route.costEst > 10000) routeRisk -= 10; // Premium service
       else if (route.costEst < 1000) routeRisk += 10; // Budget service
-      
+
       // Risk based on location types
       if (route.fromLocationType === 'port' || route.toLocationType === 'port') {
         routeRisk += 5; // Ports can have congestion
@@ -280,24 +280,24 @@ export default function ShipmentCreation() {
       if (route.fromLocationType === 'warehouse' || route.toLocationType === 'warehouse') {
         routeRisk -= 5; // Warehouses are more controlled
       }
-      
+
       // Ensure risk is within bounds
       routeRisk = Math.max(0, Math.min(100, routeRisk));
-      
+
       totalRisk += routeRisk;
       routeCount++;
     });
-    
+
     return routeCount > 0 ? Math.round(totalRisk / routeCount) : 0;
   };
 
   const createShipment = async () => {
     try {
       setLoading(true);
-      
+
       // Calculate risk score based on routes
       const calculatedRiskScore = calculateRiskScore();
-      
+
       // Create the shipment first
       const shipmentData = {
         supplierId: shipment.supplierId,
@@ -381,7 +381,7 @@ export default function ShipmentCreation() {
                   >
                     <option value="">Select Supplier</option>
                     {suppliers.map((supplier) => (
-                      <option key={supplier.id} value={supplier.id}>
+                      <option key={supplier.id} value={supplier.id} style={{ color: '#222', backgroundColor: '#fff' }}>
                         {supplier.name} - {supplier.country}
                       </option>
                     ))}
@@ -404,7 +404,7 @@ export default function ShipmentCreation() {
                   >
                     <option value="">Select Customer</option>
                     {customers.map((customer) => (
-                      <option key={customer.id} value={customer.id}>
+                      <option key={customer.id} value={customer.id} style={{ color: '#222', backgroundColor: '#fff' }}>
                         {customer.name} - {customer.country}
                       </option>
                     ))}
@@ -438,10 +438,10 @@ export default function ShipmentCreation() {
                     onChange={(e) => setShipment({ ...shipment, status: e.target.value })}
                     className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="planned">Planned</option>
-                    <option value="in_transit">In Transit</option>
-                    <option value="delayed">Delayed</option>
-                    <option value="completed">Completed</option>
+                    <option value="planned" style={{ color: '#222', backgroundColor: '#fff' }}>Planned</option>
+                    <option value="in_transit" style={{ color: '#222', backgroundColor: '#fff' }}>In Transit</option>
+                    <option value="delayed" style={{ color: '#222', backgroundColor: '#fff' }}>Delayed</option>
+                    <option value="completed" style={{ color: '#222', backgroundColor: '#fff' }}>Completed</option>
                   </select>
                 </div>
               </div>
@@ -551,7 +551,7 @@ export default function ShipmentCreation() {
           <div className="space-y-6">
             <div className="bg-white/5 rounded-lg p-6 border border-white/10">
               <h2 className="text-xl font-semibold text-white mb-4">Summary</h2>
-              
+
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-gray-400">Total Segments:</span>
@@ -567,10 +567,9 @@ export default function ShipmentCreation() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Risk Score:</span>
-                  <span className={`font-medium ${
-                    calculateRiskScore() < 30 ? 'text-green-400' :
+                  <span className={`font-medium ${calculateRiskScore() < 30 ? 'text-green-400' :
                     calculateRiskScore() < 70 ? 'text-yellow-400' : 'text-red-400'
-                  }`}>
+                    }`}>
                     {calculateRiskScore()}/100
                   </span>
                 </div>
@@ -614,10 +613,10 @@ export default function ShipmentCreation() {
                   disabled={routeIndex === -1 && shipment.routes.length > 0}
                   className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <option value="supplier">Supplier</option>
-                  <option value="port">Port</option>
-                  <option value="warehouse">Warehouse</option>
-                  <option value="customer">Customer</option>
+                  <option value="supplier" style={{ color: '#222', backgroundColor: '#fff' }}>Supplier</option>
+                  <option value="port" style={{ color: '#222', backgroundColor: '#fff' }}>Port</option>
+                  <option value="warehouse" style={{ color: '#222', backgroundColor: '#fff' }}>Warehouse</option>
+                  <option value="customer" style={{ color: '#222', backgroundColor: '#fff' }}>Customer</option>
                 </select>
               </div>
               <div>
@@ -644,10 +643,10 @@ export default function ShipmentCreation() {
                   onChange={(e) => setEditingRoute({ ...editingRoute, toLocationType: e.target.value, toLocation: '' })}
                   className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="supplier">Supplier</option>
-                  <option value="port">Port</option>
-                  <option value="warehouse">Warehouse</option>
-                  <option value="customer">Customer</option>
+                  <option value="supplier" style={{ color: '#222', backgroundColor: '#fff' }}>Supplier</option>
+                  <option value="port" style={{ color: '#222', backgroundColor: '#fff' }}>Port</option>
+                  <option value="warehouse" style={{ color: '#222', backgroundColor: '#fff' }}>Warehouse</option>
+                  <option value="customer" style={{ color: '#222', backgroundColor: '#fff' }}>Customer</option>
                 </select>
               </div>
               <div>
@@ -670,10 +669,10 @@ export default function ShipmentCreation() {
                   onChange={(e) => setEditingRoute({ ...editingRoute, mode: e.target.value })}
                   className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="sea">Sea</option>
-                  <option value="air">Air</option>
-                  <option value="road">Road</option>
-                  <option value="rail">Rail</option>
+                  <option value="sea" style={{ color: '#222', backgroundColor: '#fff' }}>Sea</option>
+                  <option value="air" style={{ color: '#222', backgroundColor: '#fff' }}>Air</option>
+                  <option value="road" style={{ color: '#222', backgroundColor: '#fff' }}>Road</option>
+                  <option value="rail" style={{ color: '#222', backgroundColor: '#fff' }}>Rail</option>
                 </select>
               </div>
               <div>

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, 
-  Shield, 
-  Brain, 
-  TrendingUp, 
-  Database, 
-  Zap, 
-  CheckCircle, 
+import {
+  ArrowRight,
+  Shield,
+  Brain,
+  TrendingUp,
+  Database,
+  Zap,
+  CheckCircle,
   BarChart3,
   AlertTriangle,
   Lightbulb,
@@ -29,28 +29,28 @@ const Navigation = () => {
           <div className="h-8 w-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg"></div>
           <span className="text-xl font-bold text-white">Veylox</span>
         </div>
-        
+
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-8 text-sm/6 text-white/80 md:flex">
           <a href="#features" className="hover:text-white transition-colors">Features</a>
           <a href="#workflow" className="hover:text-white transition-colors">How It Works</a>
           <a href="#team" className="hover:text-white transition-colors">Team</a>
         </nav>
-        
+
         <div className="hidden items-center gap-3 md:flex">
           <Link to="/signup" className="rounded-full px-4 py-2 text-sm text-white/80 hover:text-white transition-colors">Sign in</Link>
           <Link to="/app" className="rounded-full bg-white px-4 py-2 text-sm font-medium text-black shadow-sm transition hover:bg-white/90">Launch App</Link>
         </div>
-        
+
         {/* Mobile Menu Button */}
-        <button 
+        <button
           className="md:hidden rounded-full bg-white/10 px-3 py-2 text-sm"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           Menu
         </button>
       </div>
-      
+
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 bg-black/95 backdrop-blur-md border-b border-white/10">
@@ -126,7 +126,7 @@ const Hero = () => {
               // Soft top vignette
               "linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0) 40%)",
             ].join(","),
-            backgroundColor: "#000",
+            backgroundColor: "#000"
           }}
         />
 
@@ -158,17 +158,17 @@ const Hero = () => {
               <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
               Advanced Logistics Platform
             </span>
-            
+
             <h1 style={{ animationDelay: '200ms' }} className={`mt-6 text-4xl font-bold tracking-tight md:text-6xl ${isMounted ? 'animate-fadeInUp' : 'opacity-0'}`}>
               <span className="text-blue-400">Veylox</span> Logistics
               <br />
               <span className="text-blue-300">Management</span>
             </h1>
-            
+
             <p style={{ animationDelay: '300ms' }} className={`mx-auto mt-5 max-w-2xl text-balance text-white/80 md:text-lg ${isMounted ? 'animate-fadeInUp' : 'opacity-0'}`}>
               Streamline. Optimize. Deliver with Precision and Intelligence.
             </p>
-            
+
             <div style={{ animationDelay: '400ms' }} className={`mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row ${isMounted ? 'animate-fadeInUp' : 'opacity-0'}`}>
               <Link to="/app/vulnerability-assessment" className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-black shadow transition hover:bg-white/90 group">
                 <Play className="w-4 h-4 mr-2 group-hover:animate-pulse" />
@@ -230,7 +230,7 @@ const Problem = () => (
           Why Modern Logistics Needs Intelligence
         </h2>
       </div>
-      
+
       <div className="grid md:grid-cols-3 gap-8">
         <div className="text-center p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur">
           <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -239,7 +239,7 @@ const Problem = () => (
           <h3 className="text-xl font-semibold text-white mb-3">Unpredictable Disruptions</h3>
           <p className="text-white/70">Natural disasters, geopolitical tensions, and pandemics can cripple supply chains overnight, causing massive financial losses.</p>
         </div>
-        
+
         <div className="text-center p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur">
           <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <BarChart3 className="w-8 h-8 text-yellow-400" />
@@ -247,7 +247,7 @@ const Problem = () => (
           <h3 className="text-xl font-semibold text-white mb-3">Complex Interdependencies</h3>
           <p className="text-white/70">Modern supply chains span multiple countries and suppliers, making risk assessment and mitigation extremely complex.</p>
         </div>
-        
+
         <div className="text-center p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 backdrop-blur">
           <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Clock className="w-8 h-8 text-purple-400" />
@@ -272,7 +272,7 @@ const Solution = () => (
           Your comprehensive logistics management solution with AI-powered insights.
         </p>
       </div>
-      
+
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white/5 p-6 rounded-2xl shadow-lg hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 border border-white/10 backdrop-blur">
           <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
@@ -281,7 +281,7 @@ const Solution = () => (
           <h3 className="text-xl font-semibold text-white mb-3">Intelligent Risk Detection</h3>
           <p className="text-white/70">Advanced ML algorithms continuously monitor your supply chain for potential risks and anomalies.</p>
         </div>
-        
+
         <div className="bg-white/5 p-6 rounded-2xl shadow-lg hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 border border-white/10 backdrop-blur">
           <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
             <TrendingUp className="w-6 h-6 text-blue-400" />
@@ -289,7 +289,7 @@ const Solution = () => (
           <h3 className="text-xl font-semibold text-white mb-3">Predictive Analytics</h3>
           <p className="text-white/70">Forecast potential disruptions weeks or months in advance using historical data and external factors.</p>
         </div>
-        
+
         <div className="bg-white/5 p-6 rounded-2xl shadow-lg hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 border border-white/10 backdrop-blur">
           <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
             <Zap className="w-6 h-6 text-purple-400" />
@@ -297,7 +297,7 @@ const Solution = () => (
           <h3 className="text-xl font-semibold text-white mb-3">Real-time Monitoring</h3>
           <p className="text-white/70">24/7 surveillance of your entire supply network with instant alerts and notifications.</p>
         </div>
-        
+
         <div className="bg-white/5 p-6 rounded-2xl shadow-lg hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 border border-white/10 backdrop-blur">
           <div className="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center mb-4">
             <Target className="w-6 h-6 text-yellow-400" />
@@ -305,7 +305,7 @@ const Solution = () => (
           <h3 className="text-xl font-semibold text-white mb-3">Scenario Simulation</h3>
           <p className="text-white/70">Run thousands of "what-if" scenarios to test your resilience and optimize your response strategies.</p>
         </div>
-        
+
         <div className="bg-white/5 p-6 rounded-2xl shadow-lg hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 border border-white/10 backdrop-blur">
           <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center mb-4">
             <Shield className="w-6 h-6 text-red-400" />
@@ -313,7 +313,7 @@ const Solution = () => (
           <h3 className="text-xl font-semibold text-white mb-3">Automated Mitigation</h3>
           <p className="text-white/70">AI-powered recommendations and automated actions to minimize impact when disruptions occur.</p>
         </div>
-        
+
         <div className="bg-white/5 p-6 rounded-2xl shadow-lg hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 border border-white/10 backdrop-blur">
           <div className="w-12 h-12 bg-indigo-500/20 rounded-lg flex items-center justify-center mb-4">
             <Database className="w-6 h-6 text-indigo-400" />
@@ -335,11 +335,11 @@ const Workflow = () => (
           How It Works
         </h2>
       </div>
-      
+
       <div className="relative">
         {/* Connection lines */}
         <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-400 transform -translate-y-1/2"></div>
-        
+
         <div className="grid lg:grid-cols-5 gap-8 relative z-10">
           {[
             { icon: Database, title: "Ingest Data", desc: "Connect all your supply chain data sources" },
@@ -371,7 +371,7 @@ const Features = () => (
           Features & Benefits
         </h2>
       </div>
-      
+
       <div className="grid md:grid-cols-2 gap-8">
         <div className="bg-white/5 p-8 rounded-2xl shadow-lg hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 border border-white/10 backdrop-blur">
           <div className="w-16 h-16 bg-green-500/20 rounded-2xl flex items-center justify-center mb-6">
@@ -380,7 +380,7 @@ const Features = () => (
           <h3 className="text-2xl font-semibold text-white mb-4">End-to-End Visibility</h3>
           <p className="text-white/70 text-lg">Get complete transparency across your entire supply chain, from raw materials to final delivery, with real-time tracking and monitoring.</p>
         </div>
-        
+
         <div className="bg-white/5 p-8 rounded-2xl shadow-lg hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 border border-white/10 backdrop-blur">
           <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
             <BarChart3 className="w-8 h-8 text-blue-400" />
@@ -388,7 +388,7 @@ const Features = () => (
           <h3 className="text-2xl font-semibold text-white mb-4">Data-Driven Decisions</h3>
           <p className="text-white/70 text-lg">Make informed decisions based on comprehensive analytics, predictive insights, and AI-powered recommendations.</p>
         </div>
-        
+
         <div className="bg-white/5 p-8 rounded-2xl shadow-lg hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 border border-white/10 backdrop-blur">
           <div className="w-16 h-16 bg-yellow-500/20 rounded-2xl flex items-center justify-center mb-6">
             <Shield className="w-8 h-8 text-yellow-400" />
@@ -396,7 +396,7 @@ const Features = () => (
           <h3 className="text-2xl font-semibold text-white mb-4">Proactive Risk Management</h3>
           <p className="text-white/70 text-lg">Identify and address potential risks before they become problems, with automated alerts and mitigation strategies.</p>
         </div>
-        
+
         <div className="bg-white/5 p-8 rounded-2xl shadow-lg hover:bg-white/10 transition-all duration-300 hover:-translate-y-2 border border-white/10 backdrop-blur">
           <div className="w-16 h-16 bg-purple-500/20 rounded-2xl flex items-center justify-center mb-6">
             <Zap className="w-8 h-8 text-purple-400" />
@@ -421,7 +421,7 @@ const SneakPeek = () => (
           See how our AI-powered dashboard transforms complex supply chain data into actionable insights.
         </p>
       </div>
-      
+
       <div className="bg-gradient-to-br from-white/5 to-white/10 rounded-3xl p-8 md:p-12 text-center border border-white/10 backdrop-blur">
         <div className="w-full max-w-4xl mx-auto bg-black/50 rounded-2xl shadow-2xl p-8 mb-8 border border-white/10">
           <div className="w-full h-64 md:h-96 bg-gradient-to-br from-white/5 to-white/10 rounded-xl flex items-center justify-center border border-white/10">
@@ -432,7 +432,7 @@ const SneakPeek = () => (
             </div>
           </div>
         </div>
-        
+
         <Link to="/app/vulnerability-assessment" className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-lg font-semibold text-black shadow transition hover:bg-white/90 group">
           Explore Dashboard
           <ArrowUpRight className="w-5 h-5 ml-2 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
@@ -454,7 +454,7 @@ const Team = () => (
           Passionate engineers and data scientists building the future of supply chain resilience.
         </p>
       </div>
-      
+
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
         {[
           { name: "Harsh Singh", role: "Lead Developer", avatar: "👨‍💻" },
@@ -518,13 +518,13 @@ const ScrollToTop = () => {
 const FinalCTA = () => (
   <section className="py-20 bg-gradient-to-br from-blue-600 to-blue-700 text-white">
     <div className="max-w-4xl mx-auto px-6 text-center">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-          Ready to transform your logistics operations?
-        </h2>
-        <p className="text-xl mb-8 text-blue-100">
-          Join the future of intelligent logistics management with Veylox.
-        </p>
-              <Link to="/app/vulnerability-assessment" className="inline-flex items-center justify-center rounded-full bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl group">
+      <h2 className="text-4xl md:text-5xl font-bold mb-6">
+        Ready to transform your logistics operations?
+      </h2>
+      <p className="text-xl mb-8 text-blue-100">
+        Join the future of intelligent logistics management with Veylox.
+      </p>
+      <Link to="/app/vulnerability-assessment" className="inline-flex items-center justify-center rounded-full bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl group">
         Explore Full Dashboard
         <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
       </Link>
