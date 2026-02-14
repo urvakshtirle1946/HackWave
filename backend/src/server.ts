@@ -1,12 +1,26 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
+import helmet from "helmet";
 import { config } from "./config/config";
 import apiRoutes from "./module/index";
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(
+  helmet({
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
+app.use(
+  cors({
+    origin: "*", // Allow all origins (or specify your frontend URL)
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
