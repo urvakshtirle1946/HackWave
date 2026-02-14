@@ -7,57 +7,13 @@ import {
   CheckCircle, MapPin, TrendingUp, Calendar, Users, Navigation,
   Eye, EyeOff, RefreshCw, Filter, Search, Route, Globe, Info
 } from 'lucide-react';
-import { shipmentsAPI } from '../services/api';
+import { shipmentTrackingApi } from '../services/shipmentTrackingApi';
 
-// Define types based on the API response
-interface Route {
-  id: string;
-  shipmentId: string;
-  fromLocationType: string;
-  toLocationType: string;
-  sequenceNumber: number;
-  mode: string;
-  carrierName: string;
-  travelTimeEst: number;
-  costEst: number;
-  fromLocation: string;
-  toLocation: string;
-}
+// Import the Shipment type from the tracking API types
+import type { Shipment as TrackingShipment } from '../types/shipmentTracking';
 
-interface Supplier {
-  id: string;
-  name: string;
-  country: string;
-  industry: string;
-  reliabilityScore: number;
-}
-
-interface Customer {
-  id: string;
-  name: string;
-  country: string;
-  industry: string;
-  demandForecast: number;
-}
-
-interface Shipment {
-  id: string;
-  supplierId: string;
-  customerId: string;
-  originLocationType: string;
-  destinationLocationType: string;
-  mode: string;
-  departureTime: string;
-  ETA: string;
-  status: string;
-  riskScore: number;
-  destinationLocation: string;
-  originLocation: string;
-  supplier: Supplier;
-  customer: Customer;
-  routes: Route[];
-  disruptions: any[];
-}
+// Use the tracking API type
+type Shipment = TrackingShipment;
 
 // Mock location coordinates for different countries/cities
 const locationCoordinates: { [key: string]: { lat: number; lng: number; name: string } } = {
@@ -70,6 +26,18 @@ const locationCoordinates: { [key: string]: { lat: number; lng: number; name: st
   'Chennai': { lat: 13.0827, lng: 80.2707, name: 'Chennai, India' },
   'Gyanendra Singh': { lat: 22.2587, lng: 71.1924, name: 'Gujarat, India' },
   'Harsh Baghel': { lat: 23.1291, lng: 113.2644, name: 'Guangdong, China' },
+  // Tracking API locations
+  'Dubai, UAE': { lat: 25.2048, lng: 55.2708, name: 'Dubai, UAE' },
+  'Hamburg, Germany': { lat: 53.5511, lng: 9.9937, name: 'Hamburg, Germany' },
+  'New York, USA': { lat: 40.7128, lng: -74.0060, name: 'New York, USA' },
+  'London, UK': { lat: 51.5074, lng: -0.1278, name: 'London, UK' },
+  'Paris, France': { lat: 48.8566, lng: 2.3522, name: 'Paris, France' },
+  'Berlin, Germany': { lat: 52.5200, lng: 13.4050, name: 'Berlin, Germany' },
+  'Warsaw, Poland': { lat: 52.2297, lng: 21.0122, name: 'Warsaw, Poland' },
+  'Tokyo, Japan': { lat: 35.6762, lng: 139.6503, name: 'Tokyo, Japan' },
+  'Seattle, USA': { lat: 47.6062, lng: -122.3321, name: 'Seattle, USA' },
+  'Sydney, Australia': { lat: -33.8688, lng: 151.2093, name: 'Sydney, Australia' },
+  'Singapore': { lat: 1.3521, lng: 103.8198, name: 'Singapore' },
 };
 
 // Generate coordinates for locations
@@ -142,21 +110,20 @@ function MapUpdater({ shipments, selectedShipment }: { shipments: Shipment[]; se
       const allCoordinates: [number, number][] = [];
       
       shipments.forEach(shipment => {
-        // Add origin and destination coordinates
-        const originCoords = getLocationCoordinates(shipment.originLocation);
-        const destCoords = getLocationCoordinates(shipment.destinationLocation);
+        // Add origin and destination coordinates if available
+        if (shipment.originLocation) {
+          const originCoords = getLocationCoordinates(shipment.originLocation);
+          allCoordinates.push([originCoords.lat, originCoords.lng]);
+        }
+        if (shipment.destinationLocation) {
+          const destCoords = getLocationCoordinates(shipment.destinationLocation);
+          allCoordinates.push([destCoords.lat, destCoords.lng]);
+        }
         
-        allCoordinates.push([originCoords.lat, originCoords.lng]);
-        allCoordinates.push([destCoords.lat, destCoords.lng]);
-        
-        // Add route coordinates
-        shipment.routes.forEach(route => {
-          const fromCoords = getLocationCoordinates(route.fromLocation);
-          const toCoords = getLocationCoordinates(route.toLocation);
-          
-          allCoordinates.push([fromCoords.lat, fromCoords.lng]);
-          allCoordinates.push([toCoords.lat, toCoords.lng]);
-        });
+        // Add current location if available
+        if (shipment.currentLocation) {
+          allCoordinates.push([shipment.currentLocation.latitude, shipment.currentLocation.longitude]);
+        }
       });
       
       if (allCoordinates.length > 0) {
@@ -189,7 +156,7 @@ export default function ShipmentTracking() {
         setLoading(true);
         setError(null);
         
-        const shipmentsData = await shipmentsAPI.getAll();
+        const shipmentsData = await shipmentTrackingApi.getAllShipments();
         setShipments(shipmentsData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load shipments');
@@ -214,7 +181,7 @@ export default function ShipmentTracking() {
 
     refreshIntervalRef.current = setInterval(async () => {
       try {
-        const shipmentsData = await shipmentsAPI.getAll();
+        const shipmentsData = await shipmentTrackingApi.getAllShipments();
         setShipments(shipmentsData);
       } catch (error) {
         console.error('Error refreshing data:', error);
@@ -271,36 +238,27 @@ export default function ShipmentTracking() {
 
   const filteredShipments = shipments.filter(shipment => {
     const matchesSearch = 
-      shipment.supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      shipment.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      shipment.originLocation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      shipment.destinationLocation.toLowerCase().includes(searchTerm.toLowerCase());
+      (shipment.supplier?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (shipment.customer?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (shipment.originLocation || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (shipment.destinationLocation || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesFilter = filterMode === 'all' || shipment.status === filterMode;
     
     return matchesSearch && matchesFilter;
   });
 
-  const calculateTotalDistance = (routes: Route[]) => {
-    let totalDistance = 0;
-    routes.forEach(route => {
-      const fromCoords = getLocationCoordinates(route.fromLocation);
-      const toCoords = getLocationCoordinates(route.toLocation);
-      
-      // Simple distance calculation (Haversine formula would be more accurate)
-      const latDiff = Math.abs(toCoords.lat - fromCoords.lat);
-      const lngDiff = Math.abs(toCoords.lng - fromCoords.lng);
-      totalDistance += Math.sqrt(latDiff * latDiff + lngDiff * lngDiff) * 111; // Rough km conversion
-    });
-    return Math.round(totalDistance);
-  };
-
-  const calculateTotalCost = (routes: Route[]) => {
-    return routes.reduce((total, route) => total + route.costEst, 0);
-  };
-
-  const calculateTotalTime = (routes: Route[]) => {
-    return routes.reduce((total, route) => total + route.travelTimeEst, 0);
+  // Calculate distance between two points using Haversine formula
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Radius of the Earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return Math.round(R * c);
   };
 
   if (loading) {
@@ -426,19 +384,32 @@ export default function ShipmentTracking() {
                       <span className="text-xs text-gray-400">#{shipment.id.slice(-8)}</span>
                     </div>
                     
-                    <div className="space-y-1 text-sm">
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="h-3 w-3 text-blue-400" />
-                        <span className="text-white">{shipment.originLocation}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="h-3 w-3 text-green-400" />
-                        <span className="text-white">{shipment.destinationLocation}</span>
-                      </div>
+                      <div className="space-y-1 text-sm">
+                      {shipment.originLocation && (
+                        <div className="flex items-center space-x-2">
+                          <MapPin className="h-3 w-3 text-blue-400" />
+                          <span className="text-white">{shipment.originLocation}</span>
+                        </div>
+                      )}
+                      {shipment.destinationLocation && (
+                        <div className="flex items-center space-x-2">
+                          <MapPin className="h-3 w-3 text-green-400" />
+                          <span className="text-white">{shipment.destinationLocation}</span>
+                        </div>
+                      )}
+                      {shipment.currentLocation && (
+                        <div className="flex items-center space-x-2">
+                          <Navigation className="h-3 w-3 text-yellow-400" />
+                          <span className="text-white text-xs">Current: {shipment.currentLocation.latitude.toFixed(2)}, {shipment.currentLocation.longitude.toFixed(2)}</span>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="flex items-center justify-between mt-2 text-xs text-gray-400">
-                      <span>{shipment.routes.length} routes</span>
+                      <span className="flex items-center space-x-1">
+                        {getModeIcon(shipment.mode)}
+                        <span>{shipment.mode}</span>
+                      </span>
                       <span>Risk: {shipment.riskScore}%</span>
                     </div>
                   </div>
@@ -465,95 +436,95 @@ export default function ShipmentTracking() {
                 
                 {/* Render all shipments */}
                 {showAllMarkers && filteredShipments.map((shipment) => {
-                  const originCoords = getLocationCoordinates(shipment.originLocation);
-                  const destCoords = getLocationCoordinates(shipment.destinationLocation);
                   const isSelected = selectedShipment?.id === shipment.id;
+                  const originCoords = shipment.originLocation ? getLocationCoordinates(shipment.originLocation) : null;
+                  const destCoords = shipment.destinationLocation ? getLocationCoordinates(shipment.destinationLocation) : null;
                   
                   return (
                     <React.Fragment key={shipment.id}>
                       {/* Origin Marker */}
-                      <Marker
-                        position={[originCoords.lat, originCoords.lng]}
-                        icon={createCustomIcon('road', isSelected)}
-                      >
-                        <Popup>
-                          <div className="text-black">
-                            <h3 className="font-bold">Origin</h3>
-                            <p>{shipment.originLocation}</p>
-                            <p className="text-sm text-gray-600">Supplier: {shipment.supplier.name}</p>
-                          </div>
-                        </Popup>
-                      </Marker>
+                      {originCoords && (
+                        <Marker
+                          position={[originCoords.lat, originCoords.lng]}
+                          icon={createCustomIcon(shipment.mode, isSelected)}
+                        >
+                          <Popup>
+                            <div className="text-black">
+                              <h3 className="font-bold">Origin</h3>
+                              <p>{shipment.originLocation}</p>
+                              {shipment.supplier?.name && (
+                                <p className="text-sm text-gray-600">Supplier: {shipment.supplier.name}</p>
+                              )}
+                            </div>
+                          </Popup>
+                        </Marker>
+                      )}
                       
                       {/* Destination Marker */}
-                      <Marker
-                        position={[destCoords.lat, destCoords.lng]}
-                        icon={createCustomIcon('road', isSelected)}
-                      >
-                        <Popup>
-                          <div className="text-black">
-                            <h3 className="font-bold">Destination</h3>
-                            <p>{shipment.destinationLocation}</p>
-                            <p className="text-sm text-gray-600">Customer: {shipment.customer.name}</p>
-                          </div>
-                        </Popup>
-                      </Marker>
+                      {destCoords && (
+                        <Marker
+                          position={[destCoords.lat, destCoords.lng]}
+                          icon={createCustomIcon(shipment.mode, isSelected)}
+                        >
+                          <Popup>
+                            <div className="text-black">
+                              <h3 className="font-bold">Destination</h3>
+                              <p>{shipment.destinationLocation}</p>
+                              {shipment.customer?.name && (
+                                <p className="text-sm text-gray-600">Customer: {shipment.customer.name}</p>
+                              )}
+                            </div>
+                          </Popup>
+                        </Marker>
+                      )}
                       
-                      {/* Route Lines */}
-                      {shipment.routes.map((route, index) => {
-                        const fromCoords = getLocationCoordinates(route.fromLocation);
-                        const toCoords = getLocationCoordinates(route.toLocation);
-                        
-                        return (
-                          <React.Fragment key={route.id}>
-                            {/* Route Line */}
-                            <Polyline
-                              positions={[
-                                [fromCoords.lat, fromCoords.lng],
-                                [toCoords.lat, toCoords.lng]
-                              ]}
-                              color={isSelected ? '#3b82f6' : '#6b7280'}
-                              weight={isSelected ? 4 : 2}
-                              opacity={isSelected ? 0.8 : 0.4}
-                            />
-                            
-                            {/* Route Markers */}
-                            <Marker
-                              position={[fromCoords.lat, fromCoords.lng]}
-                              icon={createCustomIcon(route.mode, isSelected)}
-                            >
-                              <Popup>
-                                <div className="text-black">
-                                  <h3 className="font-bold">Route {route.sequenceNumber}</h3>
-                                  <p><strong>From:</strong> {route.fromLocation}</p>
-                                  <p><strong>To:</strong> {route.toLocation}</p>
-                                  <p><strong>Mode:</strong> {route.mode.toUpperCase()}</p>
-                                  <p><strong>Carrier:</strong> {route.carrierName}</p>
-                                  <p><strong>Time:</strong> {route.travelTimeEst}h</p>
-                                  <p><strong>Cost:</strong> ${route.costEst}</p>
-                                </div>
-                              </Popup>
-                            </Marker>
-                            
-                            <Marker
-                              position={[toCoords.lat, toCoords.lng]}
-                              icon={createCustomIcon(route.mode, isSelected)}
-                            >
-                              <Popup>
-                                <div className="text-black">
-                                  <h3 className="font-bold">Route {route.sequenceNumber}</h3>
-                                  <p><strong>From:</strong> {route.fromLocation}</p>
-                                  <p><strong>To:</strong> {route.toLocation}</p>
-                                  <p><strong>Mode:</strong> {route.mode.toUpperCase()}</p>
-                                  <p><strong>Carrier:</strong> {route.carrierName}</p>
-                                  <p><strong>Time:</strong> {route.travelTimeEst}h</p>
-                                  <p><strong>Cost:</strong> ${route.costEst}</p>
-                                </div>
-                              </Popup>
-                            </Marker>
-                          </React.Fragment>
-                        );
-                      })}
+                      {/* Current Location Marker */}
+                      {shipment.currentLocation && (
+                        <Marker
+                          position={[shipment.currentLocation.latitude, shipment.currentLocation.longitude]}
+                          icon={createCustomIcon(shipment.mode, isSelected)}
+                        >
+                          <Popup>
+                            <div className="text-black">
+                              <h3 className="font-bold">Current Location</h3>
+                              <p className="text-sm">Status: {shipment.currentLocation.status}</p>
+                              {shipment.currentLocation.speed && (
+                                <p className="text-sm">Speed: {shipment.currentLocation.speed} km/h</p>
+                              )}
+                              <p className="text-xs text-gray-500">
+                                Updated: {new Date(shipment.currentLocation.timestamp).toLocaleString()}
+                              </p>
+                            </div>
+                          </Popup>
+                        </Marker>
+                      )}
+                      
+                      {/* Route Line from Origin to Destination */}
+                      {originCoords && destCoords && (
+                        <Polyline
+                          positions={[
+                            [originCoords.lat, originCoords.lng],
+                            [destCoords.lat, destCoords.lng]
+                          ]}
+                          color={isSelected ? '#3b82f6' : '#6b7280'}
+                          weight={isSelected ? 3 : 2}
+                          opacity={0.4}
+                        />
+                      )}
+                      
+                      {/* Route Line from Origin to Current Location */}
+                      {originCoords && shipment.currentLocation && (
+                        <Polyline
+                          positions={[
+                            [originCoords.lat, originCoords.lng],
+                            [shipment.currentLocation.latitude, shipment.currentLocation.longitude]
+                          ]}
+                          color={isSelected ? '#10b981' : '#6b7280'}
+                          weight={isSelected ? 3 : 2}
+                          opacity={0.6}
+                          dashArray="5, 5"
+                        />
+                      )}
                     </React.Fragment>
                   );
                 })}
@@ -581,89 +552,90 @@ export default function ShipmentTracking() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div>
                 <h3 className="text-sm font-medium text-gray-400 mb-2">Supplier</h3>
-                <p className="text-white">{selectedShipment.supplier.name}</p>
-                <p className="text-sm text-gray-400">{selectedShipment.supplier.country}</p>
-                <p className="text-xs text-gray-500">Reliability: {selectedShipment.supplier.reliabilityScore}%</p>
+                {selectedShipment.supplier?.name ? (
+                  <p className="text-white">{selectedShipment.supplier.name}</p>
+                ) : (
+                  <p className="text-white text-sm">Supplier ID: {selectedShipment.supplierId}</p>
+                )}
+                {selectedShipment.originLocation && (
+                  <p className="text-sm text-gray-400">{selectedShipment.originLocation}</p>
+                )}
               </div>
               
               <div>
                 <h3 className="text-sm font-medium text-gray-400 mb-2">Customer</h3>
-                <p className="text-white">{selectedShipment.customer.name}</p>
-                <p className="text-sm text-gray-400">{selectedShipment.customer.country}</p>
-                <p className="text-xs text-gray-500">Demand: {selectedShipment.customer.demandForecast}%</p>
+                {selectedShipment.customer?.name ? (
+                  <p className="text-white">{selectedShipment.customer.name}</p>
+                ) : (
+                  <p className="text-white text-sm">Customer ID: {selectedShipment.customerId}</p>
+                )}
+                {selectedShipment.destinationLocation && (
+                  <p className="text-sm text-gray-400">{selectedShipment.destinationLocation}</p>
+                )}
               </div>
               
               <div>
                 <h3 className="text-sm font-medium text-gray-400 mb-2">Timeline</h3>
-                <p className="text-white">Departure: {new Date(selectedShipment.departureTime).toLocaleDateString()}</p>
-                <p className="text-white">ETA: {new Date(selectedShipment.ETA).toLocaleDateString()}</p>
+                <p className="text-white text-sm">Departure: {new Date(selectedShipment.departureTime).toLocaleString()}</p>
+                <p className="text-white text-sm">ETA: {new Date(selectedShipment.ETA).toLocaleString()}</p>
               </div>
               
               <div>
                 <h3 className="text-sm font-medium text-gray-400 mb-2">Summary</h3>
-                <p className="text-white">Total Distance: {calculateTotalDistance(selectedShipment.routes)} km</p>
-                <p className="text-white">Total Cost: ${calculateTotalCost(selectedShipment.routes).toLocaleString()}</p>
-                <p className="text-white">Total Time: {calculateTotalTime(selectedShipment.routes)}h</p>
+                <p className="text-white text-sm">Mode: {selectedShipment.mode.toUpperCase()}</p>
+                <p className="text-white text-sm">Status: {selectedShipment.status.replace('_', ' ').toUpperCase()}</p>
+                {selectedShipment.originLocation && selectedShipment.destinationLocation && (
+                  <p className="text-white text-sm">
+                    Distance: {(() => {
+                      const origin = getLocationCoordinates(selectedShipment.originLocation);
+                      const dest = getLocationCoordinates(selectedShipment.destinationLocation);
+                      return calculateDistance(origin.lat, origin.lng, dest.lat, dest.lng);
+                    })()} km
+                  </p>
+                )}
               </div>
             </div>
             
-            {/* Route Details */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
-                <Route className="h-5 w-5" />
-                <span>Route Segments ({selectedShipment.routes.length})</span>
-              </h3>
-              
-              <div className="space-y-3">
-                {selectedShipment.routes.map((route, index) => (
-                  <div key={route.id} className="bg-white/5 rounded-lg p-4 border border-white/10">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-3">
-                        <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium">
-                          {route.sequenceNumber}
-                        </span>
-                        <div className="flex items-center space-x-2">
-                          {getModeIcon(route.mode)}
-                          <span className={`font-medium ${getModeColor(route.mode)}`}>
-                            {route.mode.toUpperCase()}
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-sm text-gray-400">{route.carrierName}</span>
+            {/* Current Location Details */}
+            {selectedShipment.currentLocation && (
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+                  <Navigation className="h-5 w-5" />
+                  <span>Current Location</span>
+                </h3>
+                
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-400 mb-1">Coordinates</p>
+                      <p className="text-white">
+                        {selectedShipment.currentLocation.latitude.toFixed(4)}, {selectedShipment.currentLocation.longitude.toFixed(4)}
+                      </p>
                     </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="h-4 w-4 text-blue-400" />
-                        <span className="text-white">{route.fromLocation}</span>
-                      </div>
-                      <div className="flex items-center justify-center">
-                        <Navigation className="h-4 w-4 text-gray-400" />
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="h-4 w-4 text-green-400" />
-                        <span className="text-white">{route.toLocation}</span>
-                      </div>
+                    <div>
+                      <p className="text-gray-400 mb-1">Status</p>
+                      <p className="text-white">{selectedShipment.currentLocation.status.replace('_', ' ').toUpperCase()}</p>
                     </div>
-                    
-                    <div className="grid grid-cols-3 gap-4 mt-3 text-sm">
-                      <div className="flex items-center space-x-2">
-                        <Clock className="h-4 w-4 text-gray-400" />
-                        <span className="text-white">{route.travelTimeEst}h</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <TrendingUp className="h-4 w-4 text-gray-400" />
-                        <span className="text-white">${route.costEst}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Globe className="h-4 w-4 text-gray-400" />
-                        <span className="text-white">{route.fromLocationType} → {route.toLocationType}</span>
-                      </div>
+                    <div>
+                      <p className="text-gray-400 mb-1">Last Updated</p>
+                      <p className="text-white">{new Date(selectedShipment.currentLocation.timestamp).toLocaleString()}</p>
                     </div>
+                    {selectedShipment.currentLocation.speed !== undefined && (
+                      <div>
+                        <p className="text-gray-400 mb-1">Speed</p>
+                        <p className="text-white">{selectedShipment.currentLocation.speed} km/h</p>
+                      </div>
+                    )}
+                    {selectedShipment.currentLocation.heading !== undefined && (
+                      <div>
+                        <p className="text-gray-400 mb-1">Heading</p>
+                        <p className="text-white">{selectedShipment.currentLocation.heading}°</p>
+                      </div>
+                    )}
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>

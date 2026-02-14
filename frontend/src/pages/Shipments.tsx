@@ -405,25 +405,35 @@ export default function Shipments() {
             <CheckCircle className="h-5 w-5 text-green-400" />
             <span>Shipment Status Distribution</span>
           </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={statusData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, value }) => `${name} (${value})`}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {statusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.fill} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+          {statusData.length === 0 ? (
+            <div className="flex items-center justify-center h-[300px] text-white/50">
+              <div className="text-center">
+                <CheckCircle className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>No status data available</p>
+                <p className="text-sm mt-1">Data will appear once shipments are added</p>
+              </div>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={statusData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, value }) => `${name} (${value})`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {statusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         {/* Transport Mode Distribution */}
@@ -432,22 +442,32 @@ export default function Shipments() {
             <Ship className="h-5 w-5 text-blue-400" />
             <span>Transport Mode Distribution</span>
           </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={modeData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-              <XAxis dataKey="name" stroke="#ffffff70" />
-              <YAxis stroke="#ffffff70" />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1f2937', 
-                  border: '1px solid #374151',
-                  borderRadius: '8px',
-                  color: '#ffffff'
-                }}
-              />
-              <Bar dataKey="value" fill="#3B82F6" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          {modeData.length === 0 ? (
+            <div className="flex items-center justify-center h-[300px] text-white/50">
+              <div className="text-center">
+                <Ship className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>No transport mode data available</p>
+                <p className="text-sm mt-1">Data will appear once shipments are added</p>
+              </div>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={modeData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+                <XAxis dataKey="name" stroke="#ffffff70" />
+                <YAxis stroke="#ffffff70" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1f2937', 
+                    border: '1px solid #374151',
+                    borderRadius: '8px',
+                    color: '#ffffff'
+                  }}
+                />
+                <Bar dataKey="value" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 
@@ -459,22 +479,32 @@ export default function Shipments() {
             <AlertTriangle className="h-5 w-5 text-red-400" />
             <span>Risk Score Distribution</span>
           </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={riskData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-              <XAxis dataKey="name" stroke="#ffffff70" />
-              <YAxis stroke="#ffffff70" />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1f2937', 
-                  border: '1px solid #374151',
-                  borderRadius: '8px',
-                  color: '#ffffff'
-                }}
-              />
-              <Bar dataKey="value" fill="#EF4444" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          {(!riskData || riskData.length === 0 || riskData.every(item => item.value === 0)) ? (
+            <div className="flex items-center justify-center h-[300px] text-white/50">
+              <div className="text-center">
+                <AlertTriangle className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>No risk data available</p>
+                <p className="text-sm mt-1">Data will appear once shipments are added</p>
+              </div>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={riskData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+                <XAxis dataKey="name" stroke="#ffffff70" />
+                <YAxis stroke="#ffffff70" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1f2937', 
+                    border: '1px solid #374151',
+                    borderRadius: '8px',
+                    color: '#ffffff'
+                  }}
+                />
+                <Bar dataKey="value" fill="#EF4444" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         {/* Timeline Chart */}
@@ -483,24 +513,34 @@ export default function Shipments() {
             <Calendar className="h-5 w-5 text-blue-400" />
             <span>7-Day Shipment Timeline</span>
           </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={timelineData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
-              <XAxis dataKey="date" stroke="#ffffff70" />
-              <YAxis stroke="#ffffff70" />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1f2937', 
-                  border: '1px solid #374151',
-                  borderRadius: '8px',
-                  color: '#ffffff'
-                }}
-              />
-              <Area type="monotone" dataKey="planned" stackId="1" stroke="#F59E0B" fill="#F59E0B" fillOpacity={0.6} />
-              <Area type="monotone" dataKey="inTransit" stackId="1" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.6} />
-              <Area type="monotone" dataKey="completed" stackId="1" stroke="#10B981" fill="#10B981" fillOpacity={0.6} />
-            </AreaChart>
-          </ResponsiveContainer>
+          {(!timelineData || timelineData.length === 0 || timelineData.every(item => item.planned === 0 && item.inTransit === 0 && item.completed === 0)) ? (
+            <div className="flex items-center justify-center h-[300px] text-white/50">
+              <div className="text-center">
+                <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>No timeline data available</p>
+                <p className="text-sm mt-1">Data will appear once shipments are added</p>
+              </div>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={timelineData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+                <XAxis dataKey="date" stroke="#ffffff70" />
+                <YAxis stroke="#ffffff70" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1f2937', 
+                    border: '1px solid #374151',
+                    borderRadius: '8px',
+                    color: '#ffffff'
+                  }}
+                />
+                <Area type="monotone" dataKey="planned" stackId="1" stroke="#F59E0B" fill="#F59E0B" fillOpacity={0.6} />
+                <Area type="monotone" dataKey="inTransit" stackId="1" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.6} />
+                <Area type="monotone" dataKey="completed" stackId="1" stroke="#10B981" fill="#10B981" fillOpacity={0.6} />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 

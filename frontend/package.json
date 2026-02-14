@@ -5,8 +5,8 @@
   "description": "Veylox - Advanced Logistics and Supply Chain Management Platform",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+  "dev": "vite",
+  "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

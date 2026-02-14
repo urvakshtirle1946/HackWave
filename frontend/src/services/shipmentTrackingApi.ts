@@ -1,15 +1,26 @@
-import { Shipment, ShipmentLocation, ShipmentStats } from '../types/shipmentTracking';
+import type { Shipment, ShipmentLocation, ShipmentStats } from '../types/shipmentTracking';
 
-const API_BASE = '/api/shipment-tracking';
+// API Base URL - Update this to match your backend URL
+// Note: Backend default port is 3000, but can be overridden via PORT env variable
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE = `${API_BASE_URL}/shipment-tracking`;
 
 export const shipmentTrackingApi = {
   // Get all shipments
   async getAllShipments(): Promise<Shipment[]> {
-    const response = await fetch(`${API_BASE}/shipments`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch shipments');
+    try {
+      const response = await fetch(`${API_BASE}/shipments`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error(`Failed to connect to backend API at ${API_BASE}. Make sure the backend server is running.`);
+      }
+      throw error;
     }
-    return response.json();
   },
 
   // Get shipment by ID

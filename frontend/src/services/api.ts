@@ -1,5 +1,5 @@
 // API Base URL - Update this to match your backend URL
-const API_BASE_URL = 'http://localhost:3001/api'; // Adjust port as needed
+const API_BASE_URL = 'http://localhost:3000/api'; // Adjust port as needed
 
 // Generic API functions
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
@@ -109,7 +109,7 @@ export const airCargoAPI = {
   delete: (id: string) => apiRequest(`/air-cargo/${id}`, { method: 'DELETE' }),
   getByAirline: (airline: string) => apiRequest(`/air-cargo/airline/${airline}`),
   getByStatus: (status: string) => apiRequest(`/air-cargo/status/${status}`),
-  getByRoute: (departureAirportId: string, arrivalAirportId: string) => 
+  getByRoute: (departureAirportId: string, arrivalAirportId: string) =>
     apiRequest(`/air-cargo/route/${departureAirportId}/${arrivalAirportId}`),
 };
 
@@ -122,7 +122,7 @@ export const railCargoAPI = {
   delete: (id: string) => apiRequest(`/rail-cargo/${id}`, { method: 'DELETE' }),
   getByOperator: (railOperator: string) => apiRequest(`/rail-cargo/operator/${railOperator}`),
   getByStatus: (status: string) => apiRequest(`/rail-cargo/status/${status}`),
-  getByRoute: (departureHubId: string, arrivalHubId: string) => 
+  getByRoute: (departureHubId: string, arrivalHubId: string) =>
     apiRequest(`/rail-cargo/route/${departureHubId}/${arrivalHubId}`),
 };
 
@@ -136,7 +136,7 @@ export const disruptionsAPI = {
   delete: (id: string) => apiRequest(`/disruptions/${id}`, { method: 'DELETE' }),
   getByType: (type: string) => apiRequest(`/disruptions/type/${type}`),
   getBySeverity: (severity: string) => apiRequest(`/disruptions/severity/${severity}`),
-    getByLocation: (locationType: string, location: string) =>
+  getByLocation: (locationType: string, location: string) =>
     apiRequest(`/disruptions/location/${locationType}/${location}`),
 };
 
@@ -151,7 +151,7 @@ export const inventoryAPI = {
   getByWarehouse: (warehouseId: string) => apiRequest(`/inventory/warehouse/${warehouseId}`),
   getByProduct: (productName: string) => apiRequest(`/inventory/product/${productName}`),
   getBySku: (sku: string) => apiRequest(`/inventory/sku/${sku}`),
-  updateQuantity: (id: string, quantity: number) => 
+  updateQuantity: (id: string, quantity: number) =>
     apiRequest(`/inventory/${id}/quantity`, { method: 'PATCH', body: JSON.stringify({ quantity }) }),
 };
 
@@ -175,7 +175,7 @@ export const healthCheck = () => apiRequest('/health');
 export const getEndpoints = () => apiRequest('/endpoints');
 
 // Simulation API (AI Agent)
-const AI_AGENT_BASE_URL = 'http://localhost:3001/api'; // AI Agent runs on port 3001
+const AI_AGENT_BASE_URL = 'http://localhost:3000/api'; // AI Agent runs on port 3000
 
 const aiAgentRequest = async (endpoint: string, options: RequestInit = {}) => {
   const url = `${AI_AGENT_BASE_URL}${endpoint}`;
@@ -200,25 +200,25 @@ const aiAgentRequest = async (endpoint: string, options: RequestInit = {}) => {
 };
 
 export const simulationAPI = {
-  runScenario: (scenarioType: string, scenarioParams?: any) => 
-    aiAgentRequest('/simulation', { 
-      method: 'POST', 
-      body: JSON.stringify({ scenarioType, scenarioParams }) 
+  runScenario: (scenarioType: string, scenarioParams?: any) =>
+    aiAgentRequest('/simulation', {
+      method: 'POST',
+      body: JSON.stringify({ scenarioType, scenarioParams })
     }),
-  runRiskAssessment: (data: any) => 
-    aiAgentRequest('/risk-assessment', { 
-      method: 'POST', 
-      body: JSON.stringify(data) 
+  runRiskAssessment: (data: any) =>
+    aiAgentRequest('/risk-assessment', {
+      method: 'POST',
+      body: JSON.stringify(data)
     }),
-  runStrategicPlanning: (data: any) => 
-    aiAgentRequest('/strategic-planning', { 
-      method: 'POST', 
-      body: JSON.stringify(data) 
+  runStrategicPlanning: (data: any) =>
+    aiAgentRequest('/strategic-planning', {
+      method: 'POST',
+      body: JSON.stringify(data)
     }),
   getMonitoring: () => aiAgentRequest('/monitoring'),
-  runCustomWorkflow: (steps: any[]) => 
-    aiAgentRequest('/custom-workflow', { 
-      method: 'POST', 
-      body: JSON.stringify({ steps }) 
+  runCustomWorkflow: (steps: any[]) =>
+    aiAgentRequest('/custom-workflow', {
+      method: 'POST',
+      body: JSON.stringify({ steps })
     }),
 };

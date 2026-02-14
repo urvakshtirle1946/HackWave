@@ -57,6 +57,12 @@ model Shipment {
   riskScore               Int
   destinationLocation     String
   originLocation          String
+  currentLat              Float?
+  currentLng              Float?
+  currentLocationName     String?
+  currentSpeed            Float?
+  currentHeading          Float?
+  lastLocationUpdate      DateTime?
   routes                  Route[]
   customer                Customer             @relation("CustomerShipments", fields: [customerId], references: [id])
   supplier                Supplier             @relation("SupplierShipments", fields: [supplierId], references: [id])

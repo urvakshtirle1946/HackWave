@@ -14,9 +14,11 @@ export interface Shipment {
   supplierId: string;
   customerId: string;
   originLocationType: string;
-  originLocation: string;
+  originLocationId: string;
+  originLocation?: string;
   destinationLocationType: string;
-  destinationLocation: string;
+  destinationLocationId: string;
+  destinationLocation?: string;
   mode: string;
   departureTime: string;
   ETA: string;

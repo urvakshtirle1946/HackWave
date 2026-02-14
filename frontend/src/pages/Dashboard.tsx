@@ -330,22 +330,32 @@ export default function Dashboard() {
             <BarChart3 className="h-5 w-5 text-blue-400" />
             <h3 className="text-lg font-semibold text-white">Weekly Shipments Trend</h3>
           </div>
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={weeklyShipments}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="name" stroke="#9CA3AF" />
-              <YAxis stroke="#9CA3AF" />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1F2937', 
-                  border: '1px solid #374151',
-                  borderRadius: '8px',
-                  color: '#F9FAFB'
-                }}
-              />
-              <Bar dataKey="shipments" fill="#3B82F6" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          {weeklyShipments.length === 0 || weeklyShipments.every(item => item.shipments === 0) ? (
+            <div className="flex items-center justify-center h-[250px] text-white/50">
+              <div className="text-center">
+                <BarChart3 className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>No shipment data available</p>
+                <p className="text-sm mt-1">Data will appear once shipments are added</p>
+              </div>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={weeklyShipments}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="name" stroke="#9CA3AF" />
+                <YAxis stroke="#9CA3AF" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1F2937', 
+                    border: '1px solid #374151',
+                    borderRadius: '8px',
+                    color: '#F9FAFB'
+                  }}
+                />
+                <Bar dataKey="shipments" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         {/* Transport Mode Distribution */}
@@ -354,32 +364,42 @@ export default function Dashboard() {
             <Activity className="h-5 w-5 text-green-400" />
             <h3 className="text-lg font-semibold text-white">Transport Mode Distribution</h3>
           </div>
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Pie
-                data={transportModeData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {transportModeData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#1F2937', 
-                  border: '1px solid #374151',
-                  borderRadius: '8px',
-                  color: '#F9FAFB'
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          {transportModeData.length === 0 ? (
+            <div className="flex items-center justify-center h-[250px] text-white/50">
+              <div className="text-center">
+                <Activity className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>No transport mode data available</p>
+                <p className="text-sm mt-1">Data will appear once shipments are added</p>
+              </div>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={transportModeData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {transportModeData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#1F2937', 
+                    border: '1px solid #374151',
+                    borderRadius: '8px',
+                    color: '#F9FAFB'
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 

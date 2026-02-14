@@ -9,7 +9,12 @@ export default class ShipmentTrackingController {
       const shipments = await shipmentTrackingService.getAllShipments();
       res.json(shipments);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch shipments' });
+      console.error('Error in getAllShipments:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch shipments',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: process.env.NODE_ENV === 'development' && error instanceof Error ? error.stack : undefined
+      });
     }
   }
 
